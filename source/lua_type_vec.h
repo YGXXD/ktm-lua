@@ -5,16 +5,18 @@
 #include "../ktm/ktm/ktm.h"
 
 template <size_t N, typename T>
-constexpr inline std::array<char, 6> lua_vec_name()
+constexpr inline std::array<char, 8> lua_vec_name()
 {
     if constexpr (std::is_same_v<T, float>)
         return { 'f', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
     else if constexpr (std::is_same_v<T, double>)
         return { 'd', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
     else if constexpr (std::is_same_v<T, int>)
-        return { 'i', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
+        return { 's', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
     else if constexpr (std::is_same_v<T, unsigned int>)
         return { 'u', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
+    else
+        throw std::runtime_error("invalid lua vec type");
 }
 
 template <size_t N, typename T>
@@ -330,17 +332,121 @@ int fun_lua_vec_div(lua_State* L)
 }
 
 template <size_t N, typename T>
+int fun_lua_vec_eq(lua_State* L)
+{
+    if (luaL_is_lua_vec<N, T>(L, 1) && luaL_is_lua_vec<N, T>(L, 2))
+    {
+        ktm::vec<N, T>* v1 = luaL_check_lua_vec<N, T>(L, 1);
+        ktm::vec<N, T>* v2 = luaL_check_lua_vec<N, T>(L, 2);
+        lua_pushboolean(L, *v1 == *v2);
+    }
+    else
+    {
+        lua_pushboolean(L, false);
+    }
+    return 1;
+}
+
+template <size_t N, typename T>
+int fun_lua_vec_neq(lua_State* L)
+{
+    if (luaL_is_lua_vec<N, T>(L, 1) && luaL_is_lua_vec<N, T>(L, 2))
+    {
+        ktm::vec<N, T>* v1 = luaL_check_lua_vec<N, T>(L, 1);
+        ktm::vec<N, T>* v2 = luaL_check_lua_vec<N, T>(L, 2);
+        lua_pushboolean(L, *v1 != *v2);
+    }
+    else
+    {
+        lua_pushboolean(L, true);
+    }
+    return 1;
+}
+
+template <size_t N, typename T>
+int fun_lua_vec_lt(lua_State* L)
+{
+    if (luaL_is_lua_vec<N, T>(L, 1) && luaL_is_lua_vec<N, T>(L, 2))
+    {
+        ktm::vec<N, T>* v1 = luaL_check_lua_vec<N, T>(L, 1);
+        ktm::vec<N, T>* v2 = luaL_check_lua_vec<N, T>(L, 2);
+        lua_pushboolean(L, *v1 < *v2);
+    }
+    else
+    {
+        luaL_error(L, "invalid operator: %s < %s", luaL_typename_ext(L, 1), luaL_typename_ext(L, 2));
+    }
+    return 1;
+}
+
+template <size_t N, typename T>
+int fun_lua_vec_le(lua_State* L)
+{
+    if (luaL_is_lua_vec<N, T>(L, 1) && luaL_is_lua_vec<N, T>(L, 2))
+    {
+        ktm::vec<N, T>* v1 = luaL_check_lua_vec<N, T>(L, 1);
+        ktm::vec<N, T>* v2 = luaL_check_lua_vec<N, T>(L, 2);
+        lua_pushboolean(L, *v1 <= *v2);
+    }
+    else
+    {
+        luaL_error(L, "invalid operator: %s <= %s", luaL_typename_ext(L, 1), luaL_typename_ext(L, 2));
+    }
+    return 1;
+}
+
+template <size_t N, typename T>
+int fun_lua_vec_gt(lua_State* L)
+{
+    if (luaL_is_lua_vec<N, T>(L, 1) && luaL_is_lua_vec<N, T>(L, 2))
+    {
+        ktm::vec<N, T>* v1 = luaL_check_lua_vec<N, T>(L, 1);
+        ktm::vec<N, T>* v2 = luaL_check_lua_vec<N, T>(L, 2);
+        lua_pushboolean(L, *v1 > *v2);
+    }
+    else
+    {
+        luaL_error(L, "invalid operator: %s > %s", luaL_typename_ext(L, 1), luaL_typename_ext(L, 2));
+    }
+    return 1;
+}
+
+template <size_t N, typename T>
+int fun_lua_vec_ge(lua_State* L)
+{
+    if (luaL_is_lua_vec<N, T>(L, 1) && luaL_is_lua_vec<N, T>(L, 2))
+    {
+        ktm::vec<N, T>* v1 = luaL_check_lua_vec<N, T>(L, 1);
+        ktm::vec<N, T>* v2 = luaL_check_lua_vec<N, T>(L, 2);
+        lua_pushboolean(L, *v1 >= *v2);
+    }
+    else
+    {
+        luaL_error(L, "invalid operator: %s >= %s", luaL_typename_ext(L, 1), luaL_typename_ext(L, 2));
+    }
+    return 1;
+}
+
+template <size_t N, typename T>
 inline void register_lua_vec(lua_State* L)
 {
     constexpr auto vec_name = lua_vec_name<N, T>();
     luaL_newmetatable(L, vec_name.data());
 
-    constexpr const luaL_Reg vec_metamethods[] = {
-        { "__tostring", fun_lua_vec_tostring<N, T> }, { "__index", fun_lua_vec_index<N, T> },
-        { "__newindex", fun_lua_vec_newindex<N, T> }, { "__add", fun_lua_vec_add<N, T> },
-        { "__sub", fun_lua_vec_sub<N, T> },           { "__mul", fun_lua_vec_mul<N, T> },
-        { "__div", fun_lua_vec_div<N, T> },           { nullptr, nullptr }
-    };
+    constexpr const luaL_Reg vec_metamethods[] = { { "__tostring", fun_lua_vec_tostring<N, T> },
+                                                   { "__index", fun_lua_vec_index<N, T> },
+                                                   { "__newindex", fun_lua_vec_newindex<N, T> },
+                                                   { "__add", fun_lua_vec_add<N, T> },
+                                                   { "__sub", fun_lua_vec_sub<N, T> },
+                                                   { "__mul", fun_lua_vec_mul<N, T> },
+                                                   { "__div", fun_lua_vec_div<N, T> },
+                                                   { "__eq", fun_lua_vec_eq<N, T> },
+                                                   { "__neq", fun_lua_vec_neq<N, T> },
+                                                   { "__lt", fun_lua_vec_lt<N, T> },
+                                                   { "__le", fun_lua_vec_le<N, T> },
+                                                   { "__gt", fun_lua_vec_gt<N, T> },
+                                                   { "__ge", fun_lua_vec_ge<N, T> },
+                                                   { nullptr, nullptr } };
     luaL_setfuncs(L, vec_metamethods, 0);
 
     lua_newtable(L);
