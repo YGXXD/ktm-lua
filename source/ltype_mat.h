@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sstream>
-#include "lua_ktm_api.h"
+#include "lktm_api.h"
 
 template <size_t Row, size_t Col, typename T>
 int fun_create_lua_mat(lua_State* L)
@@ -55,8 +55,5 @@ inline void register_lua_mat(lua_State* L)
 
     lua_setmetatable(L, -2);
 
-    lua_pushvalue(L, -1);
     lua_setglobal(L, mat_name);
-
-    lua_pop(L, 1);
 }

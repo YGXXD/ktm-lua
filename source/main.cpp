@@ -1,6 +1,6 @@
 #include <iostream>
-#include "lua_type_vec.h"
-#include "lua_type_mat.h"
+#include "ltype_vec.h"
+#include "ltype_mat.h"
 
 int main(int argc, char* argv[])
 {

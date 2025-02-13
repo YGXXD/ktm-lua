@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sstream>
-#include "lua_ktm_api.h"
+#include "lktm_api.h"
 
 template <size_t N, typename T>
 int fun_create_lua_vec(lua_State* L)
@@ -428,8 +428,5 @@ inline void register_lua_vec(lua_State* L)
 
     lua_setmetatable(L, -2);
 
-    lua_pushvalue(L, -1);
     lua_setglobal(L, vec_name);
-
-    lua_pop(L, 1);
 }

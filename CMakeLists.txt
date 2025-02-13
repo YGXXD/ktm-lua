@@ -43,5 +43,5 @@ set(LUALIB_SOURCES
 )
 add_library(lualib STATIC ${LUALIB_SOURCES})
 
-add_executable(${PROJECT_NAME} source/main.cpp source/lua_ktm_api.cpp)
+add_executable(${PROJECT_NAME} source/main.cpp source/lktm_api.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE lualib) 
