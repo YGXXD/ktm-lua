@@ -6,20 +6,19 @@
 template <size_t N, typename T>
 int fun_create_lua_vec(lua_State* L)
 {
-    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>.data();
-    void* mem = lua_newuserdata(L, sizeof(ktm::vec<N, T>));
+    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
+    int arg_count = lua_gettop(L) - 1;
 
-    int n = lua_gettop(L) - 2;
-    switch (n)
+    switch (arg_count)
     {
     case 0:
     {
-        new (mem) ktm::vec<N, T>();
+        lua_newuserdata_ex<ktm::vec<N, T>>(L);
     }
     break;
     case 1:
     {
-        new (mem) ktm::vec<N, T>(static_cast<T>(luaL_checknumber(L, 2)));
+        lua_newuserdata_ex<ktm::vec<N, T>>(L, static_cast<T>(luaL_checknumber(L, 2)));
     }
     break;
     case N:
@@ -27,12 +26,12 @@ int fun_create_lua_vec(lua_State* L)
         ktm::vec<N, T> value;
         for (int i = 0; i < N; ++i)
             value[i] = static_cast<T>(luaL_checknumber(L, i + 2));
-        new (mem) ktm::vec<N, T>(value);
+        lua_newuserdata_ex<ktm::vec<N, T>>(L, value);
     }
     break;
     default:
     {
-        luaL_error(L, "invalid number of arguments on create %s: %d", vec_name, n);
+        luaL_error(L, "invalid number of arguments on create %s: %d", vec_name, arg_count);
     }
     break;
     }
@@ -193,10 +192,9 @@ int fun_lua_vec_add(lua_State* L)
         luaL_error(L, "invalid operator: %s + %s", luaL_typename_ex(L, 1), luaL_typename_ex(L, 2));
     }
 
-    void* mem = lua_newuserdata(L, sizeof(ktm::vec<N, T>));
-    new (mem) ktm::vec<N, T>(result);
+    lua_newuserdata_ex<ktm::vec<N, T>>(L, result);
 
-    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>.data();
+    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
     luaL_getmetatable(L, vec_name);
     lua_setmetatable(L, -2);
 
@@ -224,10 +222,9 @@ int fun_lua_vec_sub(lua_State* L)
         luaL_error(L, "invalid operator: %s - %s", luaL_typename_ex(L, 1), luaL_typename_ex(L, 2));
     }
 
-    void* mem = lua_newuserdata(L, sizeof(ktm::vec<N, T>));
-    new (mem) ktm::vec<N, T>(result);
+    lua_newuserdata_ex<ktm::vec<N, T>>(L, result);
 
-    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>.data();
+    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
     luaL_getmetatable(L, vec_name);
     lua_setmetatable(L, -2);
 
@@ -261,10 +258,9 @@ int fun_lua_vec_mul(lua_State* L)
         luaL_error(L, "invalid operator: %s * %s", luaL_typename_ex(L, 1), luaL_typename_ex(L, 2));
     }
 
-    void* mem = lua_newuserdata(L, sizeof(ktm::vec<N, T>));
-    new (mem) ktm::vec<N, T>(result);
+    lua_newuserdata_ex<ktm::vec<N, T>>(L, result);
 
-    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>.data();
+    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
     luaL_getmetatable(L, vec_name);
     lua_setmetatable(L, -2);
 
@@ -292,10 +288,9 @@ int fun_lua_vec_div(lua_State* L)
         luaL_error(L, "invalid operator: %s / %s", luaL_typename_ex(L, 1), luaL_typename_ex(L, 2));
     }
 
-    void* mem = lua_newuserdata(L, sizeof(ktm::vec<N, T>));
-    new (mem) ktm::vec<N, T>(result);
+    lua_newuserdata_ex<ktm::vec<N, T>>(L, result);
 
-    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>.data();
+    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
     luaL_getmetatable(L, vec_name);
     lua_setmetatable(L, -2);
 
@@ -401,7 +396,7 @@ int fun_lua_vec_ge(lua_State* L)
 template <size_t N, typename T>
 inline void register_lua_vec(lua_State* L)
 {
-    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>.data();
+    constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
     luaL_newmetatable(L, vec_name);
 
     constexpr const luaL_Reg vec_metamethods[] = { { "__tostring", fun_lua_vec_tostring<N, T> },

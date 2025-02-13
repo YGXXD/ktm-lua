@@ -10,6 +10,9 @@ extern "C"
 
 const char* luaL_typename_ex(lua_State* L, int idx);
 
+template <typename T, typename... Args>
+inline T* lua_newuserdata_ex(lua_State* L, Args&&... args);
+
 template <typename T>
 inline bool luaL_is_ktm_type(lua_State* L, int idx);
 
@@ -20,6 +23,6 @@ template <typename T>
 struct lua_ktm_typename;
 
 template <typename T>
-inline constexpr auto lua_ktm_typename_v = lua_ktm_typename<T>::value;
+inline constexpr const char* lua_ktm_typename_v = lua_ktm_typename<T>::value.data();
 
 #include "lktm_api.inl"

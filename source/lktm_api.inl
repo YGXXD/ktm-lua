@@ -42,14 +42,22 @@ struct lua_ktm_typename<ktm::mat<Row, Col, T>>
     static constexpr auto value = call();
 };
 
+template <typename T, typename... Args>
+inline T* lua_newuserdata_ex(lua_State* L, Args&&... args)
+{
+    void* mem = lua_newuserdata(L, sizeof(T));
+    new (mem) T(std::forward<Args>(args)...);
+    return reinterpret_cast<T*>(mem);
+}
+
 template <typename T>
 inline bool luaL_is_ktm_type(lua_State* L, int idx)
 {
-    return luaL_testudata(L, idx, lua_ktm_typename_v<T>.data());
+    return luaL_testudata(L, idx, lua_ktm_typename_v<T>);
 }
 
 template <typename T>
 inline T* luaL_check_ktm_type(lua_State* L, int idx)
 {
-    return reinterpret_cast<T*>(luaL_checkudata(L, idx, lua_ktm_typename_v<T>.data()));
+    return reinterpret_cast<T*>(luaL_checkudata(L, idx, lua_ktm_typename_v<T>));
 }
