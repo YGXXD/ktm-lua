@@ -1,13 +1,6 @@
-#pragma once
+#include "lua_ktm_api.h"
 
-extern "C"
-{
-#include "../lua/lua.h"
-#include "../lua/lualib.h"
-#include "../lua/lauxlib.h"
-}
-
-inline const char* luaL_typename_ext(lua_State* L, int idx)
+const char* luaL_typename_ex(lua_State* L, int idx)
 {
     if (!lua_isuserdata(L, idx))
         return lua_typename(L, lua_type(L, idx));

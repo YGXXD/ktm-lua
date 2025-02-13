@@ -19,3 +19,7 @@ print(vec1 <= vec2)
 print(vec1 >= vec2)
 print(vec1 == vec1)
 print(vec1 ~= vec2)
+
+vec3 = fvec4(1, 2, 3, 1)
+mat0 = fmat4x4(vec3, fvec4(4, 5, 6, 1), vec3, vec3)
+print(mat0)

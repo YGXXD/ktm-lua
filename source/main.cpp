@@ -1,5 +1,6 @@
 #include <iostream>
 #include "lua_type_vec.h"
+#include "lua_type_mat.h"
 
 int main(int argc, char* argv[])
 {
@@ -21,6 +22,8 @@ int main(int argc, char* argv[])
     register_lua_vec<2, double>(L);
     register_lua_vec<3, double>(L);
     register_lua_vec<4, double>(L);
+
+    register_lua_mat<4, 4, float>(L);
 
     if (argc > 1)
     {
