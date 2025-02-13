@@ -42,6 +42,38 @@ struct lua_ktm_typename<ktm::mat<Row, Col, T>>
     static constexpr auto value = call();
 };
 
+template <typename T>
+struct lua_ktm_typename<ktm::quat<T>>
+{
+    static constexpr inline std::array<char, 6> call()
+    {
+        if constexpr (std::is_same_v<T, float>)
+            return { 'f', 'q', 'u', 'a', 't', '\0' };
+        else if constexpr (std::is_same_v<T, double>)
+            return { 'd', 'q', 'u', 'a', 't', '\0' };
+        else
+            throw std::runtime_error("invalid lua quat type");
+    }
+
+    static constexpr auto value = call();
+};
+
+template <typename T>
+struct lua_ktm_typename<ktm::comp<T>>
+{
+    static constexpr inline std::array<char, 6> call()
+    {
+        if constexpr (std::is_same_v<T, float>)
+            return { 'f', 'c', 'o', 'm', 'p', '\0' };
+        else if constexpr (std::is_same_v<T, double>)
+            return { 'd', 'c', 'o', 'm', 'p', '\0' };
+        else
+            throw std::runtime_error("invalid lua comp type");
+    }
+
+    static constexpr auto value = call();
+};
+
 template <typename T, typename... Args>
 inline T* lua_newuserdata_ex(lua_State* L, Args&&... args)
 {

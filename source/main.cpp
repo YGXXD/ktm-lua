@@ -1,6 +1,8 @@
 #include <iostream>
 #include "ltype_vec.h"
 #include "ltype_mat.h"
+#include "ltype_quat.h"
+#include "ltype_comp.h"
 
 int main(int argc, char* argv[])
 {
@@ -62,6 +64,12 @@ int main(int argc, char* argv[])
     register_lua_mat<4, 2, double>(L);
     register_lua_mat<4, 3, double>(L);
     register_lua_mat<4, 4, double>(L);
+
+    register_lua_quat<float>(L);
+    register_lua_quat<double>(L);
+
+    register_lua_comp<float>(L);
+    register_lua_comp<double>(L);
 
     if (argc > 1)
     {
