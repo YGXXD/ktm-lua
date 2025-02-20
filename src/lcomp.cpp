@@ -1,10 +1,14 @@
-#pragma once
-
 #include <sstream>
-#include "ltype_comp.h"
+#include "lcomp.h"
+
+void register_lcomp(lua_State* L)
+{
+    lcomp<float>::register_type(L);
+    lcomp<double>::register_type(L);
+}
 
 template <typename T>
-int fun_create_lua_comp(lua_State* L)
+int lcomp<T>::create(lua_State* L)
 {
     constexpr auto comp_name = lua_ktm_typename_v<ktm::comp<T>>;
     int arg_count = lua_gettop(L) - 1;
@@ -40,7 +44,7 @@ int fun_create_lua_comp(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_tostring(lua_State* L)
+int lcomp<T>::tostring(lua_State* L)
 {
     ktm::comp<T>* c = luaL_check_ktm_type<ktm::comp<T>>(L, 1);
     std::stringstream ss;
@@ -50,7 +54,7 @@ int fun_lua_comp_tostring(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_index(lua_State* L)
+int lcomp<T>::index(lua_State* L)
 {
     ktm::comp<T>* c = luaL_check_ktm_type<ktm::comp<T>>(L, 1);
     if (lua_isinteger(L, 2))
@@ -98,7 +102,7 @@ int fun_lua_comp_index(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_newindex(lua_State* L)
+int lcomp<T>::newindex(lua_State* L)
 {
     ktm::comp<T>* c = luaL_check_ktm_type<ktm::comp<T>>(L, 1);
     T value = static_cast<T>(luaL_checknumber(L, 3));
@@ -145,7 +149,7 @@ int fun_lua_comp_newindex(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_add(lua_State* L)
+int lcomp<T>::add(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -167,7 +171,7 @@ int fun_lua_comp_add(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_sub(lua_State* L)
+int lcomp<T>::sub(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -189,7 +193,7 @@ int fun_lua_comp_sub(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_mul(lua_State* L)
+int lcomp<T>::mul(lua_State* L)
 {
     ktm::comp<T> result;
     if (lua_isnumber(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
@@ -225,7 +229,7 @@ int fun_lua_comp_mul(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_div(lua_State* L)
+int lcomp<T>::div(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && lua_isnumber(L, 2))
     {
@@ -247,7 +251,7 @@ int fun_lua_comp_div(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_eq(lua_State* L)
+int lcomp<T>::eq(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -264,7 +268,7 @@ int fun_lua_comp_eq(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_neq(lua_State* L)
+int lcomp<T>::neq(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -281,7 +285,7 @@ int fun_lua_comp_neq(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_lt(lua_State* L)
+int lcomp<T>::lt(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -297,7 +301,7 @@ int fun_lua_comp_lt(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_le(lua_State* L)
+int lcomp<T>::le(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -313,7 +317,7 @@ int fun_lua_comp_le(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_gt(lua_State* L)
+int lcomp<T>::gt(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -329,7 +333,7 @@ int fun_lua_comp_gt(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_comp_ge(lua_State* L)
+int lcomp<T>::ge(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::comp<T>>(L, 1) && luaL_is_ktm_type<ktm::comp<T>>(L, 2))
     {
@@ -345,30 +349,30 @@ int fun_lua_comp_ge(lua_State* L)
 }
 
 template <typename T>
-inline void register_lua_comp(lua_State* L)
+void lcomp<T>::register_type(lua_State* L)
 {
     constexpr auto comp_name = lua_ktm_typename_v<ktm::comp<T>>;
     luaL_newmetatable(L, comp_name);
 
-    constexpr const luaL_Reg comp_metamethods[] = { { "__tostring", fun_lua_comp_tostring<T> },
-                                                    { "__index", fun_lua_comp_index<T> },
-                                                    { "__newindex", fun_lua_comp_newindex<T> },
-                                                    { "__add", fun_lua_comp_add<T> },
-                                                    { "__sub", fun_lua_comp_sub<T> },
-                                                    { "__mul", fun_lua_comp_mul<T> },
-                                                    { "__div", fun_lua_comp_div<T> },
-                                                    { "__eq", fun_lua_comp_eq<T> },
-                                                    { "__neq", fun_lua_comp_neq<T> },
-                                                    { "__lt", fun_lua_comp_lt<T> },
-                                                    { "__le", fun_lua_comp_le<T> },
-                                                    { "__gt", fun_lua_comp_gt<T> },
-                                                    { "__ge", fun_lua_comp_ge<T> },
+    constexpr const luaL_Reg comp_metamethods[] = { { "__tostring", lcomp<T>::tostring },
+                                                    { "__index", lcomp<T>::index },
+                                                    { "__newindex", lcomp<T>::newindex },
+                                                    { "__add", lcomp<T>::add },
+                                                    { "__sub", lcomp<T>::sub },
+                                                    { "__mul", lcomp<T>::mul },
+                                                    { "__div", lcomp<T>::div },
+                                                    { "__eq", lcomp<T>::eq },
+                                                    { "__neq", lcomp<T>::neq },
+                                                    { "__lt", lcomp<T>::lt },
+                                                    { "__le", lcomp<T>::le },
+                                                    { "__gt", lcomp<T>::gt },
+                                                    { "__ge", lcomp<T>::ge },
                                                     { nullptr, nullptr } };
     luaL_setfuncs(L, comp_metamethods, 0);
 
     lua_newtable(L);
 
-    constexpr auto fun_create_lua_comp_wrapper = fun_create_lua_comp<T>;
+    constexpr auto fun_create_lua_comp_wrapper = lcomp<T>::create;
     lua_pushcfunction(L, fun_create_lua_comp_wrapper);
     lua_setfield(L, -2, "__call");
 

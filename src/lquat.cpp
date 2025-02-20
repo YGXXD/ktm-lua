@@ -1,10 +1,14 @@
-#pragma once
-
 #include <sstream>
-#include "ltype_quat.h"
+#include "lquat.h"
+
+void register_lquat(lua_State* L)
+{
+    lquat<float>::register_type(L);
+    lquat<double>::register_type(L);
+}
 
 template <typename T>
-int fun_create_lua_quat(lua_State* L)
+int lquat<T>::create(lua_State* L)
 {
     constexpr auto quat_name = lua_ktm_typename_v<ktm::quat<T>>;
     int arg_count = lua_gettop(L) - 1;
@@ -41,7 +45,7 @@ int fun_create_lua_quat(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_tostring(lua_State* L)
+int lquat<T>::tostring(lua_State* L)
 {
     ktm::quat<T>* q = luaL_check_ktm_type<ktm::quat<T>>(L, 1);
     std::stringstream ss;
@@ -51,7 +55,7 @@ int fun_lua_quat_tostring(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_index(lua_State* L)
+int lquat<T>::index(lua_State* L)
 {
     ktm::quat<T>* q = luaL_check_ktm_type<ktm::quat<T>>(L, 1);
     if (lua_isinteger(L, 2))
@@ -105,7 +109,7 @@ int fun_lua_quat_index(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_newindex(lua_State* L)
+int lquat<T>::newindex(lua_State* L)
 {
     ktm::quat<T>* q = luaL_check_ktm_type<ktm::quat<T>>(L, 1);
     T value = static_cast<T>(luaL_checknumber(L, 3));
@@ -158,7 +162,7 @@ int fun_lua_quat_newindex(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_add(lua_State* L)
+int lquat<T>::add(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -180,7 +184,7 @@ int fun_lua_quat_add(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_sub(lua_State* L)
+int lquat<T>::sub(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -202,7 +206,7 @@ int fun_lua_quat_sub(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_mul(lua_State* L)
+int lquat<T>::mul(lua_State* L)
 {
     ktm::quat<T> result;
     if (lua_isnumber(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
@@ -238,7 +242,7 @@ int fun_lua_quat_mul(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_div(lua_State* L)
+int lquat<T>::div(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && lua_isnumber(L, 2))
     {
@@ -260,7 +264,7 @@ int fun_lua_quat_div(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_eq(lua_State* L)
+int lquat<T>::eq(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -277,7 +281,7 @@ int fun_lua_quat_eq(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_neq(lua_State* L)
+int lquat<T>::neq(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -294,7 +298,7 @@ int fun_lua_quat_neq(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_lt(lua_State* L)
+int lquat<T>::lt(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -310,7 +314,7 @@ int fun_lua_quat_lt(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_le(lua_State* L)
+int lquat<T>::le(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -326,7 +330,7 @@ int fun_lua_quat_le(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_gt(lua_State* L)
+int lquat<T>::gt(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -342,7 +346,7 @@ int fun_lua_quat_gt(lua_State* L)
 }
 
 template <typename T>
-int fun_lua_quat_ge(lua_State* L)
+int lquat<T>::ge(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::quat<T>>(L, 1) && luaL_is_ktm_type<ktm::quat<T>>(L, 2))
     {
@@ -358,30 +362,30 @@ int fun_lua_quat_ge(lua_State* L)
 }
 
 template <typename T>
-inline void register_lua_quat(lua_State* L)
+void lquat<T>::register_type(lua_State* L)
 {
     constexpr auto quat_name = lua_ktm_typename_v<ktm::quat<T>>;
     luaL_newmetatable(L, quat_name);
 
-    constexpr const luaL_Reg quat_metamethods[] = { { "__tostring", fun_lua_quat_tostring<T> },
-                                                    { "__index", fun_lua_quat_index<T> },
-                                                    { "__newindex", fun_lua_quat_newindex<T> },
-                                                    { "__add", fun_lua_quat_add<T> },
-                                                    { "__sub", fun_lua_quat_sub<T> },
-                                                    { "__mul", fun_lua_quat_mul<T> },
-                                                    { "__div", fun_lua_quat_div<T> },
-                                                    { "__eq", fun_lua_quat_eq<T> },
-                                                    { "__neq", fun_lua_quat_neq<T> },
-                                                    { "__lt", fun_lua_quat_lt<T> },
-                                                    { "__le", fun_lua_quat_le<T> },
-                                                    { "__gt", fun_lua_quat_gt<T> },
-                                                    { "__ge", fun_lua_quat_ge<T> },
+    constexpr const luaL_Reg quat_metamethods[] = { { "__tostring", lquat<T>::tostring },
+                                                    { "__index", lquat<T>::index },
+                                                    { "__newindex", lquat<T>::newindex },
+                                                    { "__add", lquat<T>::add },
+                                                    { "__sub", lquat<T>::sub },
+                                                    { "__mul", lquat<T>::mul },
+                                                    { "__div", lquat<T>::div },
+                                                    { "__eq", lquat<T>::eq },
+                                                    { "__neq", lquat<T>::neq },
+                                                    { "__lt", lquat<T>::lt },
+                                                    { "__le", lquat<T>::le },
+                                                    { "__gt", lquat<T>::gt },
+                                                    { "__ge", lquat<T>::ge },
                                                     { nullptr, nullptr } };
     luaL_setfuncs(L, quat_metamethods, 0);
 
     lua_newtable(L);
 
-    constexpr auto fun_create_lua_quat_wrapper = fun_create_lua_quat<T>;
+    constexpr auto fun_create_lua_quat_wrapper = lquat<T>::create;
     lua_pushcfunction(L, fun_create_lua_quat_wrapper);
     lua_setfield(L, -2, "__call");
 

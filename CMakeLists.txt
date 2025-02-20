@@ -17,5 +17,6 @@ list(REMOVE_ITEM LUALIB_SOURCES ${LUA_SOURCE_DIR}/lua.c)
 
 add_library(lualib STATIC ${LUALIB_SOURCES})
 
-add_executable(${PROJECT_NAME} source/main.cpp source/lktm_api.cpp)
+file(GLOB LUAKTM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+add_executable(${PROJECT_NAME} ${LUAKTM_SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE lualib)

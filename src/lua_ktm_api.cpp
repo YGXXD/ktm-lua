@@ -1,4 +1,4 @@
-#include "lktm_api.h"
+#include "lua_ktm_api.h"
 
 const char* luaL_typename_ex(lua_State* L, int idx)
 {

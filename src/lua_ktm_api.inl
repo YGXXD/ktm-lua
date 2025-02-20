@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lktm_api.h"
+#include "lua_ktm_api.h"
 
 template <size_t N, typename T>
 struct lua_ktm_typename<ktm::vec<N, T>>

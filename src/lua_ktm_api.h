@@ -25,4 +25,4 @@ struct lua_ktm_typename;
 template <typename T>
 inline constexpr const char* lua_ktm_typename_v = lua_ktm_typename<T>::value.data();
 
-#include "lktm_api.inl"
+#include "lua_ktm_api.inl"

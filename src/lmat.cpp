@@ -1,10 +1,28 @@
-#pragma once
-
 #include <sstream>
-#include "ltype_mat.h"
+#include "lua_ktm_api.h"
 
-template <size_t Row, size_t Col, typename T>
-int fun_create_lua_mat(lua_State* L)
+template <size_t Row, size_t Col>
+void register_lmat(lua_State* L)
+{
+    lmat<Row, Col>::template register_type<int>(L);
+    lmat<Row, Col>::template register_type<unsigned int>(L);
+    lmat<Row, Col>::template register_type<float>(L);
+    lmat<Row, Col>::template register_type<double>(L);
+}
+
+template void register_lmat<2, 2>(lua_State* L);
+template void register_lmat<2, 3>(lua_State* L);
+template void register_lmat<2, 4>(lua_State* L);
+template void register_lmat<3, 2>(lua_State* L);
+template void register_lmat<3, 3>(lua_State* L);
+template void register_lmat<3, 4>(lua_State* L);
+template void register_lmat<4, 2>(lua_State* L);
+template void register_lmat<4, 3>(lua_State* L);
+template void register_lmat<4, 4>(lua_State* L);
+
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::create(lua_State* L)
 {
     constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
     int arg_count = lua_gettop(L) - 1;
@@ -25,8 +43,9 @@ int fun_create_lua_mat(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_tostring(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::tostring(lua_State* L)
 {
     ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
     std::stringstream ss;
@@ -35,8 +54,9 @@ int fun_lua_mat_tostring(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_index(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::index(lua_State* L)
 {
     if (lua_isinteger(L, 2))
     {
@@ -64,8 +84,9 @@ int fun_lua_mat_index(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_newindex(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::newindex(lua_State* L)
 {
     ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
     ktm::vec<Col, T>* value = luaL_check_ktm_type<ktm::vec<Col, T>>(L, 3);
@@ -85,8 +106,9 @@ int fun_lua_mat_newindex(lua_State* L)
     return 0;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_add(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::add(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -107,8 +129,9 @@ int fun_lua_mat_add(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_sub(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::sub(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -129,8 +152,9 @@ int fun_lua_mat_sub(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_mul(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::mul(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1))
     {
@@ -196,8 +220,9 @@ int fun_lua_mat_mul(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_div(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::div(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && lua_isnumber(L, 2))
     {
@@ -218,8 +243,9 @@ int fun_lua_mat_div(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_eq(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::eq(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -234,8 +260,9 @@ int fun_lua_mat_eq(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_neq(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::neq(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -250,8 +277,9 @@ int fun_lua_mat_neq(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_lt(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::lt(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -266,8 +294,9 @@ int fun_lua_mat_lt(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_le(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::le(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -282,8 +311,9 @@ int fun_lua_mat_le(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_gt(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::gt(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -298,8 +328,9 @@ int fun_lua_mat_gt(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-int fun_lua_mat_ge(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::ge(lua_State* L)
 {
     if (luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 1) && luaL_is_ktm_type<ktm::mat<Row, Col, T>>(L, 2))
     {
@@ -314,31 +345,32 @@ int fun_lua_mat_ge(lua_State* L)
     return 1;
 }
 
-template <size_t Row, size_t Col, typename T>
-inline void register_lua_mat(lua_State* L)
+template <size_t Row, size_t Col>
+template <typename T>
+inline void lmat<Row, Col>::register_type(lua_State* L)
 {
     constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
     luaL_newmetatable(L, mat_name);
 
-    constexpr const luaL_Reg vec_metamethods[] = { { "__tostring", fun_lua_mat_tostring<Row, Col, T> },
-                                                   { "__index", fun_lua_mat_index<Row, Col, T> },
-                                                   { "__newindex", fun_lua_mat_newindex<Row, Col, T> },
-                                                   { "__add", fun_lua_mat_add<Row, Col, T> },
-                                                   { "__sub", fun_lua_mat_sub<Row, Col, T> },
-                                                   { "__mul", fun_lua_mat_mul<Row, Col, T> },
-                                                   { "__div", fun_lua_mat_div<Row, Col, T> },
-                                                   { "__eq", fun_lua_mat_eq<Row, Col, T> },
-                                                   { "__neq", fun_lua_mat_neq<Row, Col, T> },
-                                                   { "__lt", fun_lua_mat_lt<Row, Col, T> },
-                                                   { "__le", fun_lua_mat_le<Row, Col, T> },
-                                                   { "__gt", fun_lua_mat_gt<Row, Col, T> },
-                                                   { "__ge", fun_lua_mat_ge<Row, Col, T> },
+    constexpr const luaL_Reg vec_metamethods[] = { { "__tostring", lmat<Row, Col>::tostring<T> },
+                                                   { "__index", lmat<Row, Col>::index<T> },
+                                                   { "__newindex", lmat<Row, Col>::newindex<T> },
+                                                   { "__add", lmat<Row, Col>::add<T> },
+                                                   { "__sub", lmat<Row, Col>::sub<T> },
+                                                   { "__mul", lmat<Row, Col>::mul<T> },
+                                                   { "__div", lmat<Row, Col>::div<T> },
+                                                   { "__eq", lmat<Row, Col>::eq<T> },
+                                                   { "__neq", lmat<Row, Col>::neq<T> },
+                                                   { "__lt", lmat<Row, Col>::lt<T> },
+                                                   { "__le", lmat<Row, Col>::le<T> },
+                                                   { "__gt", lmat<Row, Col>::gt<T> },
+                                                   { "__ge", lmat<Row, Col>::ge<T> },
                                                    { nullptr, nullptr } };
     luaL_setfuncs(L, vec_metamethods, 0);
 
     lua_newtable(L);
 
-    constexpr auto fun_create_lua_mat_wrapper = fun_create_lua_mat<Row, Col, T>;
+    constexpr auto fun_create_lua_mat_wrapper = lmat<Row, Col>::create<T>;
     lua_pushcfunction(L, fun_create_lua_mat_wrapper);
     lua_setfield(L, -2, "__call");
 
