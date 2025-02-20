@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lktm_api.h"
+#include "lua_ktm_api.h"
 
 void register_lcomp(lua_State* L);
 

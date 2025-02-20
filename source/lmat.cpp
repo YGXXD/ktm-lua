@@ -1,5 +1,5 @@
 #include <sstream>
-#include "lua_ktm_api.h"
+#include "lmat.h"
 
 template <size_t Row, size_t Col>
 void register_lmat(lua_State* L)

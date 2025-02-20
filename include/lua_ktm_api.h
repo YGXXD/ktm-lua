@@ -2,11 +2,11 @@
 
 extern "C"
 {
-#include "../lua/lua.h"
-#include "../lua/lualib.h"
-#include "../lua/lauxlib.h"
+#include "lua/lua.h"
+#include "lua/lualib.h"
+#include "lua/lauxlib.h"
 }
-#include "../ktm/ktm/ktm.h"
+#include "ktm/ktm/ktm.h"
 
 const char* luaL_typename_ex(lua_State* L, int idx);
 
