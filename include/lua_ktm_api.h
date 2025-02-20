@@ -13,6 +13,8 @@ extern "C"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
 }
+
+#include <stdexcept>
 #include "ktm/ktm/ktm.h"
 
 const char* luaL_typename_ex(lua_State* L, int idx);
