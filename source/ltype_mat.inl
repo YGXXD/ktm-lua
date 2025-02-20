@@ -48,6 +48,8 @@ int fun_lua_mat_index(lua_State* L)
         }
 
         lua_pushlightuserdata(L, &(*m)[index - 1]);
+        lua_pushvalue(L, 1);
+        lua_setuservalue(L, -2);
 
         constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<Col, T>>;
         luaL_getmetatable(L, vec_name);
