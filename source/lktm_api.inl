@@ -5,16 +5,16 @@
 template <size_t N, typename T>
 struct lua_ktm_typename<ktm::vec<N, T>>
 {
-    static constexpr inline std::array<char, 6> call()
+    static constexpr inline auto call()
     {
         if constexpr (std::is_same_v<T, float>)
-            return { 'f', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
+            return std::array { 'f', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
         else if constexpr (std::is_same_v<T, double>)
-            return { 'd', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
+            return std::array { 'd', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
         else if constexpr (std::is_same_v<T, int>)
-            return { 's', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
+            return std::array { 's', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
         else if constexpr (std::is_same_v<T, unsigned int>)
-            return { 'u', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
+            return std::array { 'u', 'v', 'e', 'c', static_cast<char>('0' + N), '\0' };
         else
             throw std::runtime_error("invalid lua vec type");
     }
@@ -25,16 +25,20 @@ struct lua_ktm_typename<ktm::vec<N, T>>
 template <size_t Row, size_t Col, typename T>
 struct lua_ktm_typename<ktm::mat<Row, Col, T>>
 {
-    static constexpr inline std::array<char, 8> call()
+    static constexpr inline auto call()
     {
         if constexpr (std::is_same_v<T, float>)
-            return { 'f', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col), '\0' };
+            return std::array { 'f', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col),
+                                '\0' };
         else if constexpr (std::is_same_v<T, double>)
-            return { 'd', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col), '\0' };
+            return std::array { 'd', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col),
+                                '\0' };
         else if constexpr (std::is_same_v<T, int>)
-            return { 's', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col), '\0' };
+            return std::array { 's', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col),
+                                '\0' };
         else if constexpr (std::is_same_v<T, unsigned int>)
-            return { 'u', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col), '\0' };
+            return std::array { 'u', 'm', 'a', 't', static_cast<char>('0' + Row), 'x', static_cast<char>('0' + Col),
+                                '\0' };
         else
             throw std::runtime_error("invalid lua vec type");
     }
@@ -45,12 +49,12 @@ struct lua_ktm_typename<ktm::mat<Row, Col, T>>
 template <typename T>
 struct lua_ktm_typename<ktm::quat<T>>
 {
-    static constexpr inline std::array<char, 6> call()
+    static constexpr inline auto call()
     {
         if constexpr (std::is_same_v<T, float>)
-            return { 'f', 'q', 'u', 'a', 't', '\0' };
+            return std::array { 'f', 'q', 'u', 'a', 't', '\0' };
         else if constexpr (std::is_same_v<T, double>)
-            return { 'd', 'q', 'u', 'a', 't', '\0' };
+            return std::array { 'd', 'q', 'u', 'a', 't', '\0' };
         else
             throw std::runtime_error("invalid lua quat type");
     }

@@ -47,7 +47,7 @@ int fun_lua_mat_index(lua_State* L)
             luaL_error(L, "index out of range [1,%d]", Row);
         }
 
-        lua_newuserdata_ex<ktm::vec<Col, T>>(L, (*m)[index - 1]);
+        lua_pushlightuserdata(L, &(*m)[index - 1]);
 
         constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<Col, T>>;
         luaL_getmetatable(L, vec_name);
