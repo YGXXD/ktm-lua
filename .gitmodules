@@ -1,9 +1,3 @@
-[submodule "ktm"]
-	path = ktm
-	url = git@github.com:YGXXD/ktm.git
-[submodule "lua"]
-	path = lua
-	url = git@github.com:YGXXD/lua.git
 [submodule "3rdparty/lua"]
 	path = 3rdparty/lua
 	url = git@github.com:YGXXD/lua.git
