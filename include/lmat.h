@@ -54,7 +54,7 @@ struct lmat
 
     template <typename T>
     static int neq(lua_State* L);
-    
+
     template <typename T>
     static int lt(lua_State* L);
 
