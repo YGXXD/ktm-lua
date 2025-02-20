@@ -1,3 +1,10 @@
+//  MIT License
+//
+//  Copyright (c) 2025 有个小小杜
+//
+//  Created by 有个小小杜
+//
+
 #pragma once
 
 #include "lua_ktm_api.h"

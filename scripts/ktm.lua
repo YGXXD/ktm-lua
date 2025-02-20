@@ -1,3 +1,10 @@
+--  MIT License
+--
+--  Copyright (c) 2025 有个小小杜
+--
+--  Created by 有个小小杜
+--
+
 print("test ktm-lua script")
 
 function main()

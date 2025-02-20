@@ -1,3 +1,10 @@
+//  MIT License
+//
+//  Copyright (c) 2025 有个小小杜
+//
+//  Created by 有个小小杜
+//
+
 #include "lua_ktm_api.h"
 
 const char* luaL_typename_ex(lua_State* L, int idx)
