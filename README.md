@@ -2,8 +2,8 @@
 
 ### 依赖
 
-- lua: https://github.com/lua/lua
 - ktm: https://github.com/YGXXD/ktm
+- lua: https://github.com/lua/lua
 
 ### 许可证
 
