@@ -88,9 +88,9 @@ struct lua_ktm_typename<ktm::comp<T>>
 template <typename T, typename... Args>
 inline T* lua_newuserdata_ex(lua_State* L, Args&&... args)
 {
-    void* mem = lua_newuserdata(L, sizeof(T));
-    new (mem) T(std::forward<Args>(args)...);
-    return reinterpret_cast<T*>(mem);
+    void** mem = reinterpret_cast<void**>(lua_newuserdata(L, sizeof(void*)));
+    *mem = new (std::align_val_t { alignof(T) }) T(std::forward<Args>(args)...);
+    return reinterpret_cast<T*>(*mem);
 }
 
 template <typename T>
@@ -102,5 +102,5 @@ inline bool luaL_is_ktm_type(lua_State* L, int idx)
 template <typename T>
 inline T* luaL_check_ktm_type(lua_State* L, int idx)
 {
-    return reinterpret_cast<T*>(luaL_checkudata(L, idx, lua_ktm_typename_v<T>));
+    return *reinterpret_cast<T**>(luaL_checkudata(L, idx, lua_ktm_typename_v<T>));
 }

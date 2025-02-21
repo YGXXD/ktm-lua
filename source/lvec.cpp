@@ -427,6 +427,15 @@ int lvec<N>::ge(lua_State* L)
 
 template <size_t N>
 template <typename T>
+int lvec<N>::gc(lua_State* L)
+{
+    ktm::vec<N, T>* v = luaL_check_ktm_type<ktm::vec<N, T>>(L, 1);
+    delete v;
+    return 0;
+}
+
+template <size_t N>
+template <typename T>
 void lvec<N>::register_type(lua_State* L)
 {
     constexpr auto vec_name = lua_ktm_typename_v<ktm::vec<N, T>>;
@@ -445,6 +454,7 @@ void lvec<N>::register_type(lua_State* L)
                                                    { "__le", lvec<N>::le<T> },
                                                    { "__gt", lvec<N>::gt<T> },
                                                    { "__ge", lvec<N>::ge<T> },
+                                                   { "__gc", lvec<N>::gc<T> },
                                                    { nullptr, nullptr } };
     luaL_setfuncs(L, vec_metamethods, 0);
 

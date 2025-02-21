@@ -68,5 +68,7 @@ struct lmat
     static int ge(lua_State* L);
 
     template <typename T>
+    static int gc(lua_State* L);
+    template <typename T>
     static void register_type(lua_State* L);
 };

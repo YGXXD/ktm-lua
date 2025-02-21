@@ -356,6 +356,14 @@ int lcomp<T>::ge(lua_State* L)
 }
 
 template <typename T>
+int lcomp<T>::gc(lua_State* L)
+{
+    ktm::comp<T>* c = luaL_check_ktm_type<ktm::comp<T>>(L, 1);
+    delete c;
+    return 0;
+}
+
+template <typename T>
 void lcomp<T>::register_type(lua_State* L)
 {
     constexpr auto comp_name = lua_ktm_typename_v<ktm::comp<T>>;
@@ -374,6 +382,7 @@ void lcomp<T>::register_type(lua_State* L)
                                                     { "__le", lcomp<T>::le },
                                                     { "__gt", lcomp<T>::gt },
                                                     { "__ge", lcomp<T>::ge },
+                                                    { "__gc", lcomp<T>::gc },
                                                     { nullptr, nullptr } };
     luaL_setfuncs(L, comp_metamethods, 0);
 

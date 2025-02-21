@@ -56,7 +56,7 @@ int lmat<Row, Col>::tostring(lua_State* L)
 {
     ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
     std::stringstream ss;
-    ss << *m;
+    ss << (*m);
     lua_pushstring(L, ss.str().c_str());
     return 1;
 }
@@ -74,7 +74,7 @@ int lmat<Row, Col>::index(lua_State* L)
             luaL_error(L, "index out of range [1,%d]", Row);
         }
 
-        lua_pushlightuserdata(L, &(*m)[index - 1]);
+        lua_pushlightuserdata(L, &((*m))[index - 1]);
         lua_pushvalue(L, 1);
         lua_setuservalue(L, -2);
 
@@ -104,7 +104,7 @@ int lmat<Row, Col>::newindex(lua_State* L)
         {
             luaL_error(L, "index out of range [1,%d]", Row);
         }
-        (*m)[index - 1] = *value;
+        ((*m))[index - 1] = *value;
     }
     else
     {
@@ -122,7 +122,7 @@ int lmat<Row, Col>::add(lua_State* L)
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
 
-        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, *m + *n);
+        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, (*m) + (*n));
 
         constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
         luaL_getmetatable(L, mat_name);
@@ -145,7 +145,7 @@ int lmat<Row, Col>::sub(lua_State* L)
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
 
-        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, *m - *n);
+        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, (*m) - (*n));
 
         constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
         luaL_getmetatable(L, mat_name);
@@ -159,6 +159,8 @@ int lmat<Row, Col>::sub(lua_State* L)
     return 1;
 }
 
+#include <iostream>
+
 template <size_t Row, size_t Col>
 template <typename T>
 int lmat<Row, Col>::mul(lua_State* L)
@@ -170,8 +172,7 @@ int lmat<Row, Col>::mul(lua_State* L)
         if (luaL_is_ktm_type<ktm::mat<4, Row, T>>(L, 2))
         {
             ktm::mat<4, Row, T>* n = luaL_check_ktm_type<ktm::mat<4, Row, T>>(L, 2);
-
-            lua_newuserdata_ex<ktm::mat<4, Col, T>>(L, *m * *n);
+            lua_newuserdata_ex<ktm::mat<4, Col, T>>(L, (*m) * (*n));
 
             constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<4, Col, T>>;
             luaL_getmetatable(L, mat_name);
@@ -180,7 +181,7 @@ int lmat<Row, Col>::mul(lua_State* L)
         {
             ktm::mat<3, Row, T>* n = luaL_check_ktm_type<ktm::mat<3, Row, T>>(L, 2);
 
-            lua_newuserdata_ex<ktm::mat<3, Col, T>>(L, *m * *n);
+            lua_newuserdata_ex<ktm::mat<3, Col, T>>(L, (*m) * (*n));
 
             constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<3, Col, T>>;
             luaL_getmetatable(L, mat_name);
@@ -189,7 +190,7 @@ int lmat<Row, Col>::mul(lua_State* L)
         {
             ktm::mat<2, Row, T>* n = luaL_check_ktm_type<ktm::mat<2, Row, T>>(L, 2);
 
-            lua_newuserdata_ex<ktm::mat<2, Col, T>>(L, *m * *n);
+            lua_newuserdata_ex<ktm::mat<2, Col, T>>(L, (*m) * (*n));
 
             constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<2, Col, T>>;
             luaL_getmetatable(L, mat_name);
@@ -198,7 +199,7 @@ int lmat<Row, Col>::mul(lua_State* L)
         {
             T scalar = static_cast<T>(luaL_checknumber(L, 2));
 
-            lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, *m * scalar);
+            lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, (*m) * scalar);
 
             constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
             luaL_getmetatable(L, mat_name);
@@ -213,7 +214,7 @@ int lmat<Row, Col>::mul(lua_State* L)
         T scalar = static_cast<T>(luaL_checknumber(L, 1));
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
 
-        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, *m * scalar);
+        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, (*m) * scalar);
 
         constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
         luaL_getmetatable(L, mat_name);
@@ -236,7 +237,7 @@ int lmat<Row, Col>::div(lua_State* L)
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         T scalar = static_cast<T>(luaL_checknumber(L, 2));
 
-        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, *m / scalar);
+        lua_newuserdata_ex<ktm::mat<Row, Col, T>>(L, (*m) / scalar);
 
         constexpr auto mat_name = lua_ktm_typename_v<ktm::mat<Row, Col, T>>;
         luaL_getmetatable(L, mat_name);
@@ -258,7 +259,7 @@ int lmat<Row, Col>::eq(lua_State* L)
     {
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
-        lua_pushboolean(L, *m == *n);
+        lua_pushboolean(L, (*m) == (*n));
     }
     else
     {
@@ -275,7 +276,7 @@ int lmat<Row, Col>::neq(lua_State* L)
     {
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
-        lua_pushboolean(L, *m != *n);
+        lua_pushboolean(L, (*m) != (*n));
     }
     else
     {
@@ -292,7 +293,7 @@ int lmat<Row, Col>::lt(lua_State* L)
     {
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
-        lua_pushboolean(L, *m < *n);
+        lua_pushboolean(L, (*m) < (*n));
     }
     else
     {
@@ -309,7 +310,7 @@ int lmat<Row, Col>::le(lua_State* L)
     {
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
-        lua_pushboolean(L, *m <= *n);
+        lua_pushboolean(L, (*m) <= (*n));
     }
     else
     {
@@ -326,7 +327,7 @@ int lmat<Row, Col>::gt(lua_State* L)
     {
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
-        lua_pushboolean(L, *m > *n);
+        lua_pushboolean(L, (*m) > (*n));
     }
     else
     {
@@ -343,13 +344,22 @@ int lmat<Row, Col>::ge(lua_State* L)
     {
         ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
         ktm::mat<Row, Col, T>* n = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 2);
-        lua_pushboolean(L, *m >= *n);
+        lua_pushboolean(L, (*m) >= (*n));
     }
     else
     {
         luaL_error(L, "invalid operator: %s >= %s", luaL_typename_ex(L, 1), luaL_typename_ex(L, 2));
     }
     return 1;
+}
+
+template <size_t Row, size_t Col>
+template <typename T>
+int lmat<Row, Col>::gc(lua_State* L)
+{
+    ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
+    delete m;
+    return 0;
 }
 
 template <size_t Row, size_t Col>
@@ -372,6 +382,7 @@ inline void lmat<Row, Col>::register_type(lua_State* L)
                                                    { "__le", lmat<Row, Col>::le<T> },
                                                    { "__gt", lmat<Row, Col>::gt<T> },
                                                    { "__ge", lmat<Row, Col>::ge<T> },
+                                                   { "__gc", lmat<Row, Col>::gc<T> },
                                                    { nullptr, nullptr } };
     luaL_setfuncs(L, vec_metamethods, 0);
 

@@ -42,5 +42,7 @@ struct lquat
 
     static int ge(lua_State* L);
 
+    static int gc(lua_State* L);
+
     static void register_type(lua_State* L);
 };

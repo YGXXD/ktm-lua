@@ -369,6 +369,14 @@ int lquat<T>::ge(lua_State* L)
 }
 
 template <typename T>
+int lquat<T>::gc(lua_State* L)
+{
+    ktm::quat<T>* q = luaL_check_ktm_type<ktm::quat<T>>(L, 1);
+    delete q;
+    return 0;
+}
+
+template <typename T>
 void lquat<T>::register_type(lua_State* L)
 {
     constexpr auto quat_name = lua_ktm_typename_v<ktm::quat<T>>;
@@ -387,6 +395,7 @@ void lquat<T>::register_type(lua_State* L)
                                                     { "__le", lquat<T>::le },
                                                     { "__gt", lquat<T>::gt },
                                                     { "__ge", lquat<T>::ge },
+                                                    { "__gc", lquat<T>::gc },
                                                     { nullptr, nullptr } };
     luaL_setfuncs(L, quat_metamethods, 0);
 
