@@ -430,7 +430,7 @@ template <typename T>
 int lvec<N>::gc(lua_State* L)
 {
     ktm::vec<N, T>* v = luaL_check_ktm_type<ktm::vec<N, T>>(L, 1);
-    delete v;
+    align_free(v);
     return 0;
 }
 

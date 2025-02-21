@@ -86,10 +86,32 @@ struct lua_ktm_typename<ktm::comp<T>>
 };
 
 template <typename T, typename... Args>
+inline T* align_alloc(Args&&... args)
+{
+#if defined(_MSC_VER)
+    void* mem = _aligned_malloc(sizeof(T), alignof(T));
+#else
+    void* mem = ::operator new(sizeof(T), std::align_val_t { alignof(T) });
+#endif
+    new (mem) T(std::forward<Args>(args)...);
+    return reinterpret_cast<T*>(mem);
+}
+
+template <typename T>
+inline void align_free(T* ptr)
+{
+#if defined(_MSC_VER)
+    _aligned_free(ptr);
+#else
+    ::operator delete(ptr, std::align_val_t { alignof(T) });
+#endif
+}
+
+template <typename T, typename... Args>
 inline T* lua_newuserdata_ex(lua_State* L, Args&&... args)
 {
     void** mem = reinterpret_cast<void**>(lua_newuserdata(L, sizeof(void*)));
-    *mem = new (std::align_val_t { alignof(T) }) T(std::forward<Args>(args)...);
+    *mem = align_alloc<T>(std::forward<Args>(args)...);
     return reinterpret_cast<T*>(*mem);
 }
 

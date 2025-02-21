@@ -17,6 +17,12 @@ extern "C"
 #include <stdexcept>
 #include "ktm/ktm/ktm.h"
 
+template <typename T, typename... Args>
+inline T* align_alloc(Args&&... args);
+
+template <typename T>
+inline void align_free(T* ptr);
+
 const char* luaL_typename_ex(lua_State* L, int idx);
 
 template <typename T, typename... Args>

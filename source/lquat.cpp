@@ -372,7 +372,7 @@ template <typename T>
 int lquat<T>::gc(lua_State* L)
 {
     ktm::quat<T>* q = luaL_check_ktm_type<ktm::quat<T>>(L, 1);
-    delete q;
+    align_free(q);
     return 0;
 }
 

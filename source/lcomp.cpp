@@ -359,7 +359,7 @@ template <typename T>
 int lcomp<T>::gc(lua_State* L)
 {
     ktm::comp<T>* c = luaL_check_ktm_type<ktm::comp<T>>(L, 1);
-    delete c;
+    align_free(c);
     return 0;
 }
 

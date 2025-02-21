@@ -358,7 +358,7 @@ template <typename T>
 int lmat<Row, Col>::gc(lua_State* L)
 {
     ktm::mat<Row, Col, T>* m = luaL_check_ktm_type<ktm::mat<Row, Col, T>>(L, 1);
-    delete m;
+    align_free(m);
     return 0;
 }
 
