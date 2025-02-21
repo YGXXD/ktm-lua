@@ -77,5 +77,8 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Run 
-      run: ${{ steps.strings.outputs.build-output-dir }}/ktm-lua scripts/ktm.lua
+    - name: Install
+      run: ${{ matrix.root }} cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+    
+    - name: Run
+      run: bin/ktm-lua scripts/ktm.lua
