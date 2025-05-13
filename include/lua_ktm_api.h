@@ -15,7 +15,9 @@ extern "C"
 }
 
 #include <stdexcept>
+#include <sstream>
 #include "ktm/ktm/ktm.h"
+#include "ntr/inc/nephren.hpp"
 
 template <typename T, typename... Args>
 inline T* align_alloc(Args&&... args);
