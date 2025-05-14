@@ -82,8 +82,8 @@ const int register_lvec2_ntr = []() -> int
 
 inline void register_lvec2_lua(lua_State* L)
 {
-    lua_ntr_register(L, ntr::nephren::get<lvec2<int>>()->name());
-    lua_ntr_register(L, ntr::nephren::get<lvec2<unsigned int>>()->name());
-    lua_ntr_register(L, ntr::nephren::get<lvec2<float>>()->name());
-    lua_ntr_register(L, ntr::nephren::get<lvec2<double>>()->name());
+    lua_ntr_regist_type(L, ntr::nephren::get<lvec2<int>>()->name());
+    lua_ntr_regist_type(L, ntr::nephren::get<lvec2<unsigned int>>()->name());
+    lua_ntr_regist_type(L, ntr::nephren::get<lvec2<float>>()->name());
+    lua_ntr_regist_type(L, ntr::nephren::get<lvec2<double>>()->name());
 }

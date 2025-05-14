@@ -1,5 +1,4 @@
 #include "lua_ntr_api.hpp"
-#include "ntr/inc/nephren.hpp"
 
 void lua_pushnobject(lua_State* L, ntr::nobject& object)
 {
@@ -38,14 +37,14 @@ void lua_pushnobject(lua_State* L, ntr::nobject& object)
             else if (object.type()->ops()->copy_construct)
                 object.type()->ops()->copy_construct(realdata, object.data());
             else
-                luaL_error(L, "nephren type %s has no move or copy constructor", object.type()->name().data());
+                luaL_error(L, "nephren type \"%s\" has no move or copy constructor", object.type()->name().data());
         }
         luaL_getmetatable(L, object.type()->name().data());
         lua_setmetatable(L, -2);
     }
     else
     {
-        luaL_error(L, "nephren type %s is not a registered type", object.type()->name().data());
+        luaL_error(L, "nephren type \"%s\" is not a registered type", object.type()->name().data());
     }
 }
 
@@ -74,16 +73,17 @@ ntr::nobject lua_checknobject(lua_State* L, int index, const ntr::ntype* type)
     }
 }
 
-int lua_ntr_new(lua_State* L, const std::string_view& type_name)
+int lua_ntr_new(lua_State* L, const ntr::nclass* type)
 {
+    std::string_view type_name = type->name();
     int arg_count = lua_gettop(L) - 1;
-    if (arg_count != 0)
+    if (arg_count > 1)
     {
-        luaL_error(L, "nephren type %s new arguments size must be 0, but %d", type_name.data(), arg_count);
+        luaL_error(L, "nephren type \"%s\" create error : arguments size must be 0 or 1, but %d", type_name.data(),
+                   arg_count);
         return 0;
     }
 
-    auto type = ntr::nephren::get(type_name);
     void* realdata = _ntr_align_alloc(type->size(), type->align());
     if (type->ops()->default_construct)
         type->ops()->default_construct(realdata);
@@ -92,35 +92,54 @@ int lua_ntr_new(lua_State* L, const std::string_view& type_name)
     void** userdata = reinterpret_cast<void**>(lua_newuserdata(L, sizeof(void*)));
     *userdata = realdata;
 
+    if (arg_count == 1)
+    {
+        if (lua_istable(L, 2))
+        {
+            int index = lua_absindex(L, 2);
+            lua_pushnil(L);
+            while (lua_next(L, index) != 0)
+            {
+                size_t key_len;
+                const char* key = lua_tolstring(L, -2, &key_len);
+                if (const ntr::nproperty* property = type->get_property({ key, key_len }))
+                {
+                    ntr::nobject value = lua_checknobject(L, -1, property->property_type());
+                    property->set(ntr::nwrapper(type, realdata), value.wrapper());
+                }
+                else
+                {
+                    luaL_error(L, "nephren type \"%s\" create error : arguments table has unknown property \"%s\"",
+                               type_name.data(), key);
+                }
+                lua_pop(L, 1);
+            }
+        }
+        else
+        {
+            luaL_error(L, "nephren type \"%s\" create error : arguments must be a table", type_name.data());
+            return 0;
+        }
+    }
+
     luaL_getmetatable(L, type_name.data());
     lua_setmetatable(L, -2);
 
     return 1;
 }
 
-int lua_ntr_delete(lua_State* L, const std::string_view& type_name)
+int lua_ntr_delete(lua_State* L, const ntr::nclass* type)
 {
-    void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, type_name.data()));
+    void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, type->name().data()));
     _ntr_align_free(realdata);
     return 0;
 }
 
-int lua_ntr_call(lua_State* L, const std::string_view& type_name, const std::string_view& function_name)
+int lua_ntr_call(lua_State* L, const ntr::nclass* type, const std::string_view& function_name)
 {
-    const ntr::ntype* type = ntr::nephren::get(type_name);
-    if (type == nullptr)
-    {
-        luaL_error(L, "nephren type %s not found", type_name.data());
-        return 0;
-    }
-    const ntr::nclass* cls = type->as_class();
-    if (cls == nullptr)
-    {
-        luaL_error(L, "nephren type %s is not a class", type_name.data());
-        return 0;
-    }
+    std::string_view type_name = type->name();
 
-    const ntr::nfunction* function = cls->get_function(function_name);
+    const ntr::nfunction* function = type->get_function(function_name);
     std::vector<ntr::nobject> object_temps;
     object_temps.reserve(8);
     for (int i = 0; i < function->argument_types().size(); ++i)
@@ -147,45 +166,43 @@ int lua_ntr_call(lua_State* L, const std::string_view& type_name, const std::str
     return 1;
 }
 
-void lua_ntr_register_function(lua_State* L, const ntr::nclass* type)
+void lua_ntr_regist_function(lua_State* L, const ntr::nclass* type)
 {
     if (type == nullptr)
-        luaL_error(L, "nephren type is nullptr, cannot register function");
+        luaL_error(L, "nephren type regist function error : type is nullptr");
 
     luaL_getmetatable(L, type->name().data());
+    lua_pushlightuserdata(L, const_cast<ntr::nclass*>(type));
     for (auto it = type->function_begin(); it != type->function_end(); ++it)
     {
-        lua_pushlstring(L, type->name().data(), type->name().size());
+        lua_pushvalue(L, -1);
         lua_pushlstring(L, (*it).get()->name().data(), (*it).get()->name().size());
         auto call_lambda = [](lua_State* L)
         {
-            size_t type_name_len;
-            const char* type_name = lua_tolstring(L, lua_upvalueindex(1), &type_name_len);
+            const ntr::nclass* cls = reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1)));
             size_t func_name_len;
             const char* func_name = lua_tolstring(L, lua_upvalueindex(2), &func_name_len);
-            return lua_ntr_call(L, { type_name, type_name_len }, { func_name, func_name_len });
+            return lua_ntr_call(L, cls, { func_name, func_name_len });
         };
         lua_pushcclosure(L, call_lambda, 2);
-        lua_setfield(L, -2, (*it).get()->name().data());
+        lua_setfield(L, -3, (*it).get()->name().data());
     }
-    lua_pop(L, 1);
+    lua_pop(L, 2);
 }
 
-void lua_ntr_register_property(lua_State* L, const ntr::nclass* type)
+void lua_ntr_regist_property(lua_State* L, const ntr::nclass* type)
 {
     if (type == nullptr)
-        luaL_error(L, "nephren type is nullptr, cannot register property");
+        luaL_error(L, "nephren type regist property error : type is nullptr");
 
     luaL_getmetatable(L, type->name().data());
-    lua_pushlstring(L, type->name().data(), type->name().size());
+    lua_pushlightuserdata(L, const_cast<ntr::nclass*>(type));
     auto index_lambda = [](lua_State* L)
     {
-        size_t type_name_len;
-        const char* type_name = lua_tolstring(L, lua_upvalueindex(1), &type_name_len);
-        auto cls = ntr::nephren::get(type_name)->as_class();
+        const ntr::nclass* cls = reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1)));
         size_t key_len;
         const char* key = lua_tolstring(L, 2, &key_len);
-        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, type_name));
+        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, cls->name().data()));
         if (const ntr::nproperty* property = cls->get_property({ key, key_len }))
         {
             ntr::nobject result = property->get(ntr::nwrapper(cls, realdata));
@@ -201,12 +218,10 @@ void lua_ntr_register_property(lua_State* L, const ntr::nclass* type)
     };
     auto new_index_lambda = [](lua_State* L)
     {
-        size_t type_name_len;
-        const char* type_name = lua_tolstring(L, lua_upvalueindex(1), &type_name_len);
-        auto cls = ntr::nephren::get(type_name)->as_class();
+        const ntr::nclass* cls = reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1)));
         size_t key_len;
         const char* key = lua_tolstring(L, 2, &key_len);
-        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, type_name));
+        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, cls->name().data()));
         if (const ntr::nproperty* property = cls->get_property({ key, key_len }))
         {
             ntr::nobject value = lua_checknobject(L, 3, property->property_type());
@@ -214,7 +229,8 @@ void lua_ntr_register_property(lua_State* L, const ntr::nclass* type)
         }
         else
         {
-            luaL_error(L, "nephren type %s has no property %s", type_name, key);
+            luaL_error(L, "nephren type \"%s\" set property \"%s\" error : has no property \"%s\"", cls->name().data(),
+                       key);
         }
         return 0;
     };
@@ -226,35 +242,43 @@ void lua_ntr_register_property(lua_State* L, const ntr::nclass* type)
     lua_pop(L, 1);
 }
 
-void lua_ntr_register(lua_State* L, const std::string_view& type_name)
+void lua_ntr_regist_metatable(lua_State* L, const ntr::nclass* type)
 {
-    auto type = ntr::nephren::get(type_name);
+    if (type == nullptr)
+        luaL_error(L, "nephren type regist metatable error : type is nullptr");
+
     luaL_newmetatable(L, type->name().data());
 
-    lua_pushlstring(L, type->name().data(), type->name().size());
+    lua_pushlightuserdata(L, const_cast<ntr::nclass*>(type));
+    lua_pushvalue(L, -1);
     auto gc_lambda = [](lua_State* L)
     {
-        size_t type_name_len;
-        const char* type_name = lua_tolstring(L, lua_upvalueindex(1), &type_name_len);
-        return lua_ntr_delete(L, { type_name, type_name_len });
+        return lua_ntr_delete(L, reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1))));
     };
     lua_pushcclosure(L, gc_lambda, 1);
-    lua_setfield(L, -2, "__gc");
+    lua_setfield(L, -3, "__gc");
 
     lua_newtable(L);
-    lua_pushlstring(L, type->name().data(), type->name().size());
+    lua_pushvalue(L, -2);
     auto create_lambda = [](lua_State* L)
     {
-        size_t type_name_len;
-        const char* type_name = lua_tolstring(L, lua_upvalueindex(1), &type_name_len);
-        return lua_ntr_new(L, { type_name, type_name_len });
+        return lua_ntr_new(L, reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1))));
     };
     lua_pushcclosure(L, create_lambda, 1);
     lua_setfield(L, -2, "__call");
 
-    lua_setmetatable(L, -2);
+    lua_setmetatable(L, -3);
+    lua_pop(L, 1);
     lua_setglobal(L, type->name().data());
+}
 
-    lua_ntr_register_function(L, type->as_class());
-    lua_ntr_register_property(L, type->as_class());
+void lua_ntr_regist_type(lua_State* L, const std::string_view& type_name)
+{
+    auto type = ntr::nephren::get(type_name);
+    if (!type->is_class())
+        luaL_error(L, "nephren type regist error : type \"%s\" is not a class", type_name.data());
+
+    lua_ntr_regist_metatable(L, type->as_class());
+    lua_ntr_regist_function(L, type->as_class());
+    lua_ntr_regist_property(L, type->as_class());
 }
