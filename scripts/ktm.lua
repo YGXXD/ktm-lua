@@ -7,8 +7,8 @@
 
 print("test ktm-lua script")
 
-function main()
-    print("- test ktm-lua vec")
+local function main()
+    print("- test ktm-lua vec: ")
     local vec0 = fvec2({
         x = 128,
         y = 128,
@@ -17,10 +17,21 @@ function main()
         x = -5,
         y = -20,
     })
-    local vec2 = vec0 + vec1
-    print(vec2)
+    print("  "..tostring(vec0 + vec1))
+    print("  "..tostring(vec0 - vec1))
+    print("  "..tostring(vec0 * vec1))
+    print("  "..tostring(vec0 / vec1))
+    print("  "..tostring(vec0 == vec1))
+    print("  "..tostring(vec0 ~= vec1))
+    print("  "..tostring(vec0 <= vec1))
+    print("  "..tostring(vec0 >= vec1))
+    print("  "..tostring(vec0 < vec1))
+    print("  "..tostring(vec0 > vec1))
+    vec0.x = 100
+    vec0.y = -150
+    print("  "..tostring(-vec0))
 
-    print("- test ktm-lua quat")
+    print("- test ktm-lua quat: ")
     local quat0 = fquat({
         i = 1,
         j = 2,
@@ -33,8 +44,116 @@ function main()
         k = 7,
         r = 8,
     })
-    local quat2 = quat0 * quat1
-    print(quat2)
+    print("  "..tostring(quat0 + quat1))
+    print("  "..tostring(quat0 - quat1))
+    print("  "..tostring(quat0 * quat1))
+    print("  "..tostring(quat0 == quat1))
+    print("  "..tostring(quat0 ~= quat1))
+    print("  "..tostring(quat0 <= quat1))
+    print("  "..tostring(quat0 >= quat1))
+    print("  "..tostring(quat0 < quat1))
+    print("  "..tostring(quat0 > quat1))
+    quat0.i = 0.5
+    quat0.j = -0.5
+    quat0.k = -0.5
+    quat0.r = 0.5
+    print("  "..tostring(-quat0))
+
+    print("- test ktm-lua comp: ")
+    local comp0 = fcomp({
+        r = 1,
+        i = 2,
+    })
+    local comp1 = fcomp({
+        i = 3,
+        r = 4,
+    })
+    print("  "..tostring(comp0 + comp1))
+    print("  "..tostring(comp0 - comp1))
+    print("  "..tostring(comp0 * comp1))
+    print("  "..tostring(comp0 == comp1))
+    print("  "..tostring(comp0 ~= comp1))
+    print("  "..tostring(comp0 <= comp1))
+    print("  "..tostring(comp0 >= comp1))
+    print("  "..tostring(comp0 < comp1))
+    print("  "..tostring(comp0 > comp1))
+    comp0.i = 0.5
+    comp0.r = -0.5
+    print("  "..tostring(-comp0))
+
+    print("- test ktm-lua mat: ")
+    local mat0 = fmat2x3({
+        col1 = fvec3({
+            x = 2,
+            y = 2,
+            z = 2,
+        }),
+        col2 = fvec3({
+            x = 5,
+            y = 6,
+            z = 7,
+        })
+    })
+    local mat1 = fmat3x2({
+        col1 = fvec2({
+            x = 1,
+            y = 2,
+        }),
+        col2 = fvec2({
+            x = 3,
+            y = 4,
+        }),
+        col3 = fvec2({
+            x = 2,
+            y = 1,
+        }),
+    })
+    print("  "..tostring(mat0 + mat0))
+    print("  "..tostring(mat0 - mat0))
+    print("  "..tostring(mat0 * mat1))
+    
+    mat0.col1.x = 0
+    mat0.col1.y = 1
+    mat0.col1.z = 1
+    mat0.col2.x = 0
+    mat0.col2.y = 0
+    mat0.col2.z = 1
+    print("  "..tostring(mat0))
+
+    mat0 = fmat4x4({
+        col1 = fvec4({
+            x = 1,
+            y = 2,
+            z = 3,
+            w = 4,
+        }),
+        col2 = fvec4({
+            x = 5,
+            y = 6,
+            z = 7,
+            w = 8,
+        }),
+        col3 = fvec4({
+            x = 1,
+            y = 2,
+            z = 3,
+            w = 4,
+        }),
+        col4 = fvec4({
+            x = 5,
+            y = 6,
+            z = 7,
+            w = 8,
+        }),
+    })
+    mat1 = mat0 * mat0
+    print("  "..tostring(mat1))
+    print("  "..tostring(mat0 == mat1))
+    print("  "..tostring(mat0 ~= mat1))
+    print("  "..tostring(mat0 <= mat1))
+    print("  "..tostring(mat0 >= mat1))
+    print("  "..tostring(mat0 < mat1))
+    print("  "..tostring(mat0 > mat1))
 end
 
 main()
