@@ -1,0 +1,18 @@
+#pragma once
+
+#include <string_view>
+#include "ntr/inc/nephren.hpp"
+
+struct lua_State;
+
+void* lua_new_ntrdata(lua_State* L, const ntr::nclass* type);
+void* lua_check_ntrdata(lua_State* L, int index, const ntr::nclass* type);
+void lua_pushnobject(lua_State* L, ntr::nobject& object);
+ntr::nobject lua_checknobject(lua_State* L, int index, const ntr::ntype* type);
+int lua_ntr_new(lua_State* L, const ntr::nclass* type);
+int lua_ntr_delete(lua_State* L, const ntr::nclass* type);
+int lua_ntr_call(lua_State* L, const ntr::nclass* type, const std::string_view& function_name);
+void lua_ntr_regist_function(lua_State* L, const ntr::nclass* type);
+void lua_ntr_regist_property(lua_State* L, const ntr::nclass* type);
+void lua_ntr_regist_metatable(lua_State* L, const ntr::nclass* type);
+void lua_ntr_regist_type(lua_State* L, const std::string_view& type_name);
