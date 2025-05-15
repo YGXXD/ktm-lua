@@ -1,14 +1,9 @@
 #pragma once
 
-extern "C"
-{
-#include "lua/lua.h"
-#include "lua/lualib.h"
-#include "lua/lauxlib.h"
-}
-
 #include <string_view>
 #include "ntr/inc/nephren.hpp"
+
+struct lua_State;
 
 void lua_pushnobject(lua_State* L, ntr::nobject& object);
 

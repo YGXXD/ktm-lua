@@ -1,4 +1,10 @@
-#include "lua_ntr_api.hpp"
+#include "lntr_binding.hpp"
+
+extern "C"
+{
+#include "lua/lua.h"
+#include "lua/lauxlib.h"
+}
 
 void lua_pushnobject(lua_State* L, ntr::nobject& object)
 {
