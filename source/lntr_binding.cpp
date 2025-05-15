@@ -6,6 +6,29 @@ extern "C"
 #include "lua/lauxlib.h"
 }
 
+void* lua_new_ntrdata(lua_State* L, const ntr::nclass* type)
+{
+    uintptr_t type_size = static_cast<uintptr_t>(type->size());
+    uintptr_t type_align = static_cast<uintptr_t>(type->align());
+    void* userdata = lua_newuserdata(L, sizeof(ptrdiff_t) + type_size + type_align - 1);
+    void* start = reinterpret_cast<char*>(userdata) + sizeof(ptrdiff_t);
+    uintptr_t start_addr = reinterpret_cast<uintptr_t>(start);
+    uintptr_t align_addr = (start_addr + type_align - 1) & ~(type_align - 1);
+    *reinterpret_cast<ptrdiff_t*>(userdata) = align_addr - start_addr;
+    return reinterpret_cast<void*>(align_addr);
+}
+
+void* lua_check_ntrdata(lua_State* L, int index, const ntr::nclass* type)
+{
+    void* userdata = luaL_checkudata(L, index, type->name().data());
+    if (!lua_islightuserdata(L, index))
+    {
+        ptrdiff_t offset = *reinterpret_cast<ptrdiff_t*>(userdata);
+        return reinterpret_cast<char*>(userdata) + sizeof(ptrdiff_t) + offset;
+    }
+    return userdata;
+}
+
 void lua_pushnobject(lua_State* L, ntr::nobject& object)
 {
     if (object.type()->is_numeric())
@@ -27,7 +50,7 @@ void lua_pushnobject(lua_State* L, ntr::nobject& object)
     {
         lua_pushlstring(L, object.as<std::string>().c_str(), object.as<std::string>().size());
     }
-    else if (object.type()->is_registered())
+    else if (object.type()->is_registered() && object.type()->is_class())
     {
         if (object.kind() == ntr::nobject::eobject::eref)
         {
@@ -35,13 +58,11 @@ void lua_pushnobject(lua_State* L, ntr::nobject& object)
         }
         else
         {
-            void* realdata = _ntr_align_alloc(object.type()->size(), object.type()->align());
-            void** userdata = reinterpret_cast<void**>(lua_newuserdata(L, sizeof(void*)));
-            *userdata = realdata;
+            void* userdata = lua_new_ntrdata(L, object.type()->as_class());
             if (object.type()->ops()->move_construct)
-                object.type()->ops()->move_construct(realdata, object.data());
+                object.type()->ops()->move_construct(userdata, object.data());
             else if (object.type()->ops()->copy_construct)
-                object.type()->ops()->copy_construct(realdata, object.data());
+                object.type()->ops()->copy_construct(userdata, object.data());
             else
                 luaL_error(L, "nephren type \"%s\" has no move or copy constructor", object.type()->name().data());
         }
@@ -56,9 +77,6 @@ void lua_pushnobject(lua_State* L, ntr::nobject& object)
 
 ntr::nobject lua_checknobject(lua_State* L, int index, const ntr::ntype* type)
 {
-    if (type == nullptr)
-        luaL_error(L, "nephren type is nullptr, cannot check nobject");
-
     if (type->is_numeric())
     {
         ntr::nobject result = type->new_instance();
@@ -72,11 +90,16 @@ ntr::nobject lua_checknobject(lua_State* L, int index, const ntr::ntype* type)
         const char* str = luaL_checklstring(L, index, &len);
         return type->new_instance_rv(ntr::nwrapper(std::string(str, len)));
     }
+    else if (type->is_registered() && type->is_class())
+    {
+        void* userdata = lua_check_ntrdata(L, index, type->as_class());
+        return type->new_reference(ntr::nwrapper(type, userdata));
+    }
     else
     {
-        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, index, type->name().data()));
-        return type->new_reference(ntr::nwrapper(type, realdata));
+        luaL_error(L, "nephren type \"%s\" is not a registered type", type->name().data());
     }
+    return type->new_instance();
 }
 
 int lua_ntr_new(lua_State* L, const ntr::nclass* type)
@@ -90,13 +113,11 @@ int lua_ntr_new(lua_State* L, const ntr::nclass* type)
         return 0;
     }
 
-    void* realdata = _ntr_align_alloc(type->size(), type->align());
+    void* userdata = lua_new_ntrdata(L, type);
     if (type->ops()->default_construct)
-        type->ops()->default_construct(realdata);
+        type->ops()->default_construct(userdata);
     else
-        memset(realdata, 0, type->size());
-    void** userdata = reinterpret_cast<void**>(lua_newuserdata(L, sizeof(void*)));
-    *userdata = realdata;
+        memset(userdata, 0, type->size());
 
     if (arg_count == 1)
     {
@@ -111,7 +132,7 @@ int lua_ntr_new(lua_State* L, const ntr::nclass* type)
                 if (const ntr::nproperty* property = type->get_property({ key, key_len }))
                 {
                     ntr::nobject value = lua_checknobject(L, -1, property->property_type());
-                    property->set(ntr::nwrapper(type, realdata), value.wrapper());
+                    property->set(ntr::nwrapper(type, userdata), value.wrapper());
                 }
                 else
                 {
@@ -136,8 +157,9 @@ int lua_ntr_new(lua_State* L, const ntr::nclass* type)
 
 int lua_ntr_delete(lua_State* L, const ntr::nclass* type)
 {
-    void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, type->name().data()));
-    _ntr_align_free(realdata);
+    void* userdata = lua_check_ntrdata(L, 1, type);
+    if (type->ops()->destruct)
+        type->ops()->destruct(userdata);
     return 0;
 }
 
@@ -208,10 +230,10 @@ void lua_ntr_regist_property(lua_State* L, const ntr::nclass* type)
         const ntr::nclass* cls = reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1)));
         size_t key_len;
         const char* key = lua_tolstring(L, 2, &key_len);
-        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, cls->name().data()));
+        void* userdata = lua_check_ntrdata(L, 1, cls);
         if (const ntr::nproperty* property = cls->get_property({ key, key_len }))
         {
-            ntr::nobject result = property->get(ntr::nwrapper(cls, realdata));
+            ntr::nobject result = property->get(ntr::nwrapper(cls, userdata));
             lua_pushnobject(L, result);
         }
         else
@@ -227,11 +249,11 @@ void lua_ntr_regist_property(lua_State* L, const ntr::nclass* type)
         const ntr::nclass* cls = reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1)));
         size_t key_len;
         const char* key = lua_tolstring(L, 2, &key_len);
-        void* realdata = *reinterpret_cast<void**>(luaL_checkudata(L, 1, cls->name().data()));
+        void* userdata = lua_check_ntrdata(L, 1, cls);
         if (const ntr::nproperty* property = cls->get_property({ key, key_len }))
         {
             ntr::nobject value = lua_checknobject(L, 3, property->property_type());
-            property->set(ntr::nwrapper(cls, realdata), value.wrapper());
+            property->set(ntr::nwrapper(cls, userdata), value.wrapper());
         }
         else
         {
