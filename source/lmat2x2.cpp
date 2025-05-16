@@ -67,6 +67,60 @@ std::string lmat2x2<T>::__tostring() const
     return value.to_string();
 }
 
+template <typename T>
+lmat2x2<T> lmat2x2<T>::create(const lvec2<T>& col1, const lvec2<T>& col2)
+{
+    return lmat2x2<T> { ktm::mat<2, 2, T> { col1.value, col2.value } };
+}
+
+template <typename T>
+lmat2x2<T> lmat2x2<T>::from_row(const lvec2<T>& row1, const lvec2<T>& row2)
+{
+    return lmat2x2<T> { ktm::mat<2, 2, T>::from_row(row1.value, row2.value) };
+}
+
+template <typename T>
+lmat2x2<T> lmat2x2<T>::from_diag(const lvec2<T>& diag)
+{
+    return lmat2x2<T> { ktm::mat<2, 2, T>::from_diag(diag.value) };
+}
+
+template <typename T>
+lmat2x2<T> lmat2x2<T>::from_eye()
+{
+    return lmat2x2<T> { ktm::mat<2, 2, T>::from_eye() };
+}
+
+template <typename T>
+lmat2x2<T> lmat2x2<T>::transpose(const lmat2x2& mat)
+{
+    return lmat2x2<T> { ktm::transpose(mat.value) };
+}
+
+template <typename T>
+lvec2<T> lmat2x2<T>::diagonal(const lmat2x2& mat)
+{
+    return lvec2<T> { ktm::diagonal(mat.value) };
+}
+
+template <typename T>
+T lmat2x2<T>::trace(const lmat2x2& mat)
+{
+    return ktm::trace(mat.value);
+}
+
+template <typename T>
+T lmat2x2<T>::determinant(const lmat2x2& mat)
+{
+    return ktm::determinant(mat.value);
+}
+
+template <typename T, typename Void>
+lmat2x2<T> lmat2x2_floating<T, Void>::inverse(const lmat2x2<T>& mat)
+{
+    return lmat2x2<T> { ktm::inverse(mat.value) };
+}
+
 const int regist_lmat2x2::flag = []() -> int
 {
     auto regist_ntr_lmat2x2_lambda = []<typename T>()
@@ -95,8 +149,21 @@ const int regist_lmat2x2::flag = []() -> int
             .function("__gt", &lmat2x2<T>::__gt)
             .function("__ge", &lmat2x2<T>::__ge)
             .function("__tostring", &lmat2x2<T>::__tostring)
+            .function("create", &lmat2x2<T>::create)
+            .function("from_row", &lmat2x2<T>::from_row)
+            .function("from_diag", &lmat2x2<T>::from_diag)
+            .function("from_eye", &lmat2x2<T>::from_eye)
+            .function("transpose", &lmat2x2<T>::transpose)
+            .function("diagonal", &lmat2x2<T>::diagonal)
+            .function("trace", &lmat2x2<T>::trace)
+            .function("determinant", &lmat2x2<T>::determinant)
             .property("col1", &lmat2x2<T>::col1)
             .property("col2", &lmat2x2<T>::col2);
+
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            ntr::nephren::type<lmat2x2<T>>().function("inverse", &lmat2x2_floating<T>::inverse);
+        }
     };
 
     regist_ntr_lmat2x2_lambda.template operator()<int>();

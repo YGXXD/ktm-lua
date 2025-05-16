@@ -25,6 +25,15 @@ struct lmat4x4
     bool __ge(const lmat4x4& other);
     std::string __tostring() const;
 
+    static lmat4x4 create(const lvec4<T>& col1, const lvec4<T>& col2, const lvec4<T>& col3, const lvec4<T>& col4);
+    static lmat4x4 from_row(const lvec4<T>& row1, const lvec4<T>& row2, const lvec4<T>& row3, const lvec4<T>& row4);
+    static lmat4x4 from_diag(const lvec4<T>& diag);
+    static lmat4x4 from_eye();
+    static lmat4x4 transpose(const lmat4x4& mat);
+    static lvec4<T> diagonal(const lmat4x4& mat);
+    static T trace(const lmat4x4& mat);
+    static T determinant(const lmat4x4& mat);
+
     union
     {
         ktm::mat<4, 4, T> value;
@@ -36,6 +45,12 @@ struct lmat4x4
             lvec4<T> col4;
         };
     };
+};
+
+template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
+struct lmat4x4_floating
+{
+    static lmat4x4<T> inverse(const lmat4x4<T>& mat);
 };
 
 struct regist_lmat4x4
