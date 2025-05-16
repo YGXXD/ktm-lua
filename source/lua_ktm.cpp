@@ -29,121 +29,104 @@ extern "C"
 #include "lua/lauxlib.h"
 }
 
-void lua_regist_lvecn(lua_State* L)
+std::vector<std::string_view> registed_ntr_type_names()
 {
+    std::vector<std::string_view> type_names;
     if (regist_lvec2::flag)
     {
-        lua_ntr_regist_type(L, regist_lvec2::iname);
-        lua_ntr_regist_type(L, regist_lvec2::uname);
-        lua_ntr_regist_type(L, regist_lvec2::fname);
-        lua_ntr_regist_type(L, regist_lvec2::dname);
+        type_names.push_back(regist_lvec2::iname);
+        type_names.push_back(regist_lvec2::uname);
+        type_names.push_back(regist_lvec2::fname);
+        type_names.push_back(regist_lvec2::dname);
     }
     if (regist_lvec3::flag)
     {
-        lua_ntr_regist_type(L, regist_lvec3::iname);
-        lua_ntr_regist_type(L, regist_lvec3::uname);
-        lua_ntr_regist_type(L, regist_lvec3::fname);
-        lua_ntr_regist_type(L, regist_lvec3::dname);
+        type_names.push_back(regist_lvec3::iname);
+        type_names.push_back(regist_lvec3::uname);
+        type_names.push_back(regist_lvec3::fname);
+        type_names.push_back(regist_lvec3::dname);
     }
     if (regist_lvec4::flag)
     {
-        lua_ntr_regist_type(L, regist_lvec4::iname);
-        lua_ntr_regist_type(L, regist_lvec4::uname);
-        lua_ntr_regist_type(L, regist_lvec4::fname);
-        lua_ntr_regist_type(L, regist_lvec4::dname);
+        type_names.push_back(regist_lvec4::iname);
+        type_names.push_back(regist_lvec4::uname);
+        type_names.push_back(regist_lvec4::fname);
+        type_names.push_back(regist_lvec4::dname);
     }
-}
-
-void lua_regist_lmatnxm(lua_State* L)
-{
     if (regist_lmat2x2::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat2x2::iname);
-        lua_ntr_regist_type(L, regist_lmat2x2::uname);
-        lua_ntr_regist_type(L, regist_lmat2x2::fname);
-        lua_ntr_regist_type(L, regist_lmat2x2::dname);
+        type_names.push_back(regist_lmat2x2::iname);
+        type_names.push_back(regist_lmat2x2::uname);
+        type_names.push_back(regist_lmat2x2::fname);
+        type_names.push_back(regist_lmat2x2::dname);
     }
     if (regist_lmat2x3::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat2x3::iname);
-        lua_ntr_regist_type(L, regist_lmat2x3::uname);
-        lua_ntr_regist_type(L, regist_lmat2x3::fname);
-        lua_ntr_regist_type(L, regist_lmat2x3::dname);
+        type_names.push_back(regist_lmat2x3::iname);
+        type_names.push_back(regist_lmat2x3::uname);
+        type_names.push_back(regist_lmat2x3::fname);
+        type_names.push_back(regist_lmat2x3::dname);
     }
     if (regist_lmat2x4::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat2x4::iname);
-        lua_ntr_regist_type(L, regist_lmat2x4::uname);
-        lua_ntr_regist_type(L, regist_lmat2x4::fname);
-        lua_ntr_regist_type(L, regist_lmat2x4::dname);
+        type_names.push_back(regist_lmat2x4::iname);
+        type_names.push_back(regist_lmat2x4::uname);
+        type_names.push_back(regist_lmat2x4::fname);
+        type_names.push_back(regist_lmat2x4::dname);
     }
     if (regist_lmat3x2::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat3x2::iname);
-        lua_ntr_regist_type(L, regist_lmat3x2::uname);
-        lua_ntr_regist_type(L, regist_lmat3x2::fname);
-        lua_ntr_regist_type(L, regist_lmat3x2::dname);
+        type_names.push_back(regist_lmat3x2::iname);
+        type_names.push_back(regist_lmat3x2::uname);
+        type_names.push_back(regist_lmat3x2::fname);
+        type_names.push_back(regist_lmat3x2::dname);
     }
     if (regist_lmat3x3::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat3x3::iname);
-        lua_ntr_regist_type(L, regist_lmat3x3::uname);
-        lua_ntr_regist_type(L, regist_lmat3x3::fname);
-        lua_ntr_regist_type(L, regist_lmat3x3::dname);
+        type_names.push_back(regist_lmat3x3::iname);
+        type_names.push_back(regist_lmat3x3::uname);
+        type_names.push_back(regist_lmat3x3::fname);
+        type_names.push_back(regist_lmat3x3::dname);
     }
     if (regist_lmat3x4::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat3x4::iname);
-        lua_ntr_regist_type(L, regist_lmat3x4::uname);
-        lua_ntr_regist_type(L, regist_lmat3x4::fname);
-        lua_ntr_regist_type(L, regist_lmat3x4::dname);
-    }
-    if (regist_lmat4x4::flag)
-    {
-        lua_ntr_regist_type(L, regist_lmat4x4::iname);
-        lua_ntr_regist_type(L, regist_lmat4x4::uname);
-        lua_ntr_regist_type(L, regist_lmat4x4::fname);
-        lua_ntr_regist_type(L, regist_lmat4x4::dname);
+        type_names.push_back(regist_lmat3x4::iname);
+        type_names.push_back(regist_lmat3x4::uname);
+        type_names.push_back(regist_lmat3x4::fname);
+        type_names.push_back(regist_lmat3x4::dname);
     }
     if (regist_lmat4x2::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat4x2::iname);
-        lua_ntr_regist_type(L, regist_lmat4x2::uname);
-        lua_ntr_regist_type(L, regist_lmat4x2::fname);
-        lua_ntr_regist_type(L, regist_lmat4x2::dname);
+        type_names.push_back(regist_lmat4x2::iname);
+        type_names.push_back(regist_lmat4x2::uname);
+        type_names.push_back(regist_lmat4x2::fname);
+        type_names.push_back(regist_lmat4x2::dname);
     }
     if (regist_lmat4x3::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat4x3::iname);
-        lua_ntr_regist_type(L, regist_lmat4x3::uname);
-        lua_ntr_regist_type(L, regist_lmat4x3::fname);
-        lua_ntr_regist_type(L, regist_lmat4x3::dname);
+        type_names.push_back(regist_lmat4x3::iname);
+        type_names.push_back(regist_lmat4x3::uname);
+        type_names.push_back(regist_lmat4x3::fname);
+        type_names.push_back(regist_lmat4x3::dname);
     }
     if (regist_lmat4x4::flag)
     {
-        lua_ntr_regist_type(L, regist_lmat4x4::iname);
-        lua_ntr_regist_type(L, regist_lmat4x4::uname);
-        lua_ntr_regist_type(L, regist_lmat4x4::fname);
-        lua_ntr_regist_type(L, regist_lmat4x4::dname);
+        type_names.push_back(regist_lmat4x4::iname);
+        type_names.push_back(regist_lmat4x4::uname);
+        type_names.push_back(regist_lmat4x4::fname);
+        type_names.push_back(regist_lmat4x4::dname);
     }
-}
-
-void lua_regist_lquat(lua_State* L)
-{
-    if (regist_lquat::flag)
-    {
-        lua_ntr_regist_type(L, regist_lquat::fname);
-        lua_ntr_regist_type(L, regist_lquat::dname);
-    }
-}
-
-void lua_regist_lcomp(lua_State* L)
-{
     if (regist_lcomp::flag)
     {
-        lua_ntr_regist_type(L, regist_lcomp::fname);
-        lua_ntr_regist_type(L, regist_lcomp::dname);
+        type_names.push_back(regist_lcomp::fname);
+        type_names.push_back(regist_lcomp::dname);
     }
+    if (regist_lquat::flag)
+    {
+        type_names.push_back(regist_lquat::fname);
+        type_names.push_back(regist_lquat::dname);
+    }
+    return type_names;
 }
 
 int main(int argc, char* argv[])
@@ -151,10 +134,14 @@ int main(int argc, char* argv[])
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
 
-    lua_regist_lvecn(L);
-    lua_regist_lmatnxm(L);
-    lua_regist_lquat(L);
-    lua_regist_lcomp(L);
+    lua_newtable(L);
+    std::vector<std::string_view> type_names = registed_ntr_type_names();
+    for (const auto& type_name : type_names)
+    {
+        lua_ntr_new_type(L, type_name);
+        lua_setfield(L, -2, type_name.data());
+    }
+    lua_setglobal(L, "ktm");
 
     if (argc > 1)
     {
