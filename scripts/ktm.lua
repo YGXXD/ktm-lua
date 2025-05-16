@@ -9,11 +9,11 @@ print("test ktm-lua script")
 
 local function main()
     print("- test ktm-lua vec: ")
-    local vec0 = fvec2({
+    local vec0 = ktm.fvec2.new({
         x = 128,
         y = 128,
     })
-    local vec1 = fvec2({
+    local vec1 = ktm.fvec2.new({
         x = -5,
         y = -20,
     })
@@ -32,13 +32,13 @@ local function main()
     print("  "..tostring(-vec0))
 
     print("- test ktm-lua quat: ")
-    local quat0 = fquat({
+    local quat0 = ktm.fquat.new({
         i = 1,
         j = 2,
         k = 3,
         r = 4,
     })
-    local quat1 = fquat({
+    local quat1 = ktm.fquat.new({
         i = 5,
         j = 6,
         k = 7,
@@ -60,11 +60,11 @@ local function main()
     print("  "..tostring(-quat0))
 
     print("- test ktm-lua comp: ")
-    local comp0 = fcomp({
+    local comp0 = ktm.fcomp.new({
         r = 1,
         i = 2,
     })
-    local comp1 = fcomp({
+    local comp1 = ktm.fcomp.new({
         i = 3,
         r = 4,
     })
@@ -82,28 +82,28 @@ local function main()
     print("  "..tostring(-comp0))
 
     print("- test ktm-lua mat: ")
-    local mat0 = fmat2x3({
-        col1 = fvec3({
+    local mat0 = ktm.fmat2x3.new({
+        col1 = ktm.fvec3.new({
             x = 2,
             y = 2,
             z = 2,
         }),
-        col2 = fvec3({
+        col2 = ktm.fvec3.new({
             x = 5,
             y = 6,
             z = 7,
         })
     })
-    local mat1 = fmat3x2({
-        col1 = fvec2({
+    local mat1 = ktm.fmat3x2.new({
+        col1 = ktm.fvec2.new({
             x = 1,
             y = 2,
         }),
-        col2 = fvec2({
+        col2 = ktm.fvec2.new({
             x = 3,
             y = 4,
         }),
-        col3 = fvec2({
+        col3 = ktm.fvec2.new({
             x = 2,
             y = 1,
         }),
@@ -120,26 +120,26 @@ local function main()
     mat0.col2.z = 1
     print("  "..tostring(mat0))
 
-    mat0 = fmat4x4({
-        col1 = fvec4({
+    mat0 = ktm.fmat4x4.new({
+        col1 = ktm.fvec4.new({
             x = 1,
             y = 2,
             z = 3,
             w = 4,
         }),
-        col2 = fvec4({
+        col2 = ktm.fvec4.new({
             x = 5,
             y = 6,
             z = 7,
             w = 8,
         }),
-        col3 = fvec4({
+        col3 = ktm.fvec4.new({
             x = 1,
             y = 2,
             z = 3,
             w = 4,
         }),
-        col4 = fvec4({
+        col4 = ktm.fvec4.new({
             x = 5,
             y = 6,
             z = 7,
