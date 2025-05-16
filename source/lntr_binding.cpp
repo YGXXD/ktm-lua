@@ -106,7 +106,7 @@ ntr::nobject lua_checknobject(lua_State* L, int index, const ntr::ntype* type)
 int lua_ntr_new(lua_State* L, const ntr::nclass* type)
 {
     std::string_view type_name = type->name();
-    int arg_count = lua_gettop(L) - 1;
+    int arg_count = lua_gettop(L);
     if (arg_count > 1)
     {
         luaL_error(L, "nephren type \"%s\" create error : arguments size must be 0 or 1, but %d", type_name.data(),
@@ -122,9 +122,9 @@ int lua_ntr_new(lua_State* L, const ntr::nclass* type)
 
     if (arg_count == 1)
     {
-        if (lua_istable(L, 2))
+        if (lua_istable(L, 1))
         {
-            int index = lua_absindex(L, 2);
+            int index = lua_absindex(L, 1);
             lua_pushnil(L);
             while (lua_next(L, index) != 0)
             {
@@ -201,11 +201,13 @@ void lua_ntr_regist_function(lua_State* L, const ntr::nclass* type)
         luaL_error(L, "nephren type regist function error : type is nullptr");
 
     luaL_getmetatable(L, type->name().data());
+    lua_getglobal(L, type->name().data());
     lua_pushlightuserdata(L, const_cast<ntr::nclass*>(type));
     for (auto it = type->function_begin(); it != type->function_end(); ++it)
     {
+        std::string_view func_name = (*it).get()->name();
         lua_pushvalue(L, -1);
-        lua_pushlstring(L, (*it).get()->name().data(), (*it).get()->name().size());
+        lua_pushlstring(L, func_name.data(), func_name.size());
         auto call_lambda = [](lua_State* L)
         {
             const ntr::nclass* cls = reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1)));
@@ -214,9 +216,12 @@ void lua_ntr_regist_function(lua_State* L, const ntr::nclass* type)
             return lua_ntr_call(L, cls, { func_name, func_name_len });
         };
         lua_pushcclosure(L, call_lambda, 2);
-        lua_setfield(L, -3, (*it).get()->name().data());
+        if ((*it).get()->is_static())
+            lua_setfield(L, -3, func_name.data());
+        else
+            lua_setfield(L, -4, func_name.data());
     }
-    lua_pop(L, 2);
+    lua_pop(L, 3);
 }
 
 void lua_ntr_regist_property(lua_State* L, const ntr::nclass* type)
@@ -294,11 +299,10 @@ void lua_ntr_regist_metatable(lua_State* L, const ntr::nclass* type)
         return lua_ntr_new(L, reinterpret_cast<const ntr::nclass*>(lua_touserdata(L, lua_upvalueindex(1))));
     };
     lua_pushcclosure(L, create_lambda, 1);
-    lua_setfield(L, -2, "__call");
-
-    lua_setmetatable(L, -3);
-    lua_pop(L, 1);
+    lua_setfield(L, -2, "new");
     lua_setglobal(L, type->name().data());
+
+    lua_pop(L, 2);
 }
 
 void lua_ntr_regist_type(lua_State* L, const std::string_view& type_name)
