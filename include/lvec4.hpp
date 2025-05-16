@@ -37,7 +37,7 @@ struct lvec4
 
 struct regist_lvec4
 {
-    static constexpr std::string_view iname = "ivec4";
+    static constexpr std::string_view iname = "svec4";
     static constexpr std::string_view uname = "uvec4";
     static constexpr std::string_view fname = "fvec4";
     static constexpr std::string_view dname = "dvec4";

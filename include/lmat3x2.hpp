@@ -45,7 +45,7 @@ struct lmat3x2
 
 struct regist_lmat3x2
 {
-    static constexpr std::string_view iname = "imat3x2";
+    static constexpr std::string_view iname = "smat3x2";
     static constexpr std::string_view uname = "umat3x2";
     static constexpr std::string_view fname = "fmat3x2";
     static constexpr std::string_view dname = "dmat3x2";

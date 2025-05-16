@@ -37,7 +37,7 @@ struct lvec3
 
 struct regist_lvec3
 {
-    static constexpr std::string_view iname = "ivec3";
+    static constexpr std::string_view iname = "svec3";
     static constexpr std::string_view uname = "uvec3";
     static constexpr std::string_view fname = "fvec3";
     static constexpr std::string_view dname = "dvec3";
