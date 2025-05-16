@@ -22,13 +22,6 @@
 #include "lmat4x3.hpp"
 #include "lmat4x4.hpp"
 
-extern "C"
-{
-#include "lua/lua.h"
-#include "lua/lualib.h"
-#include "lua/lauxlib.h"
-}
-
 std::vector<std::string_view> registed_ntr_type_names()
 {
     std::vector<std::string_view> type_names;
@@ -129,18 +122,33 @@ std::vector<std::string_view> registed_ntr_type_names()
     return type_names;
 }
 
+extern "C"
+{
+#include "lua/lua.h"
+#include "lua/lualib.h"
+#include "lua/lauxlib.h"
+
+    extern int luaopen_ktm(lua_State* L)
+    {
+        luaL_checkversion(L);
+        lua_newtable(L);
+        std::vector<std::string_view> type_names = registed_ntr_type_names();
+        for (const auto& type_name : type_names)
+        {
+            lua_ntr_new_type(L, type_name);
+            lua_setfield(L, -2, type_name.data());
+        }
+        return 1;
+    }
+}
+
 int main(int argc, char* argv[])
 {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
 
-    lua_newtable(L);
-    std::vector<std::string_view> type_names = registed_ntr_type_names();
-    for (const auto& type_name : type_names)
-    {
-        lua_ntr_new_type(L, type_name);
-        lua_setfield(L, -2, type_name.data());
-    }
+    lua_pushcfunction(L, luaopen_ktm);
+    lua_call(L, 0, 1);
     lua_setglobal(L, "ktm");
 
     if (argc > 1)
