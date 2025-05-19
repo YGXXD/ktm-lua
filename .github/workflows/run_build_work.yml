@@ -76,13 +76,14 @@ jobs:
 
     - name: Install Lua (Windows)
       if: runner.os == 'Windows'
+      working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
       run: |
-        if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-        }
-        scoop bucket add extras
-        scoop install luarocks
-        luarocks install lua-dev
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat
+        ./vcpkg install lua[tools]
+        $lua_path = "${{ steps.strings.outputs.build-3rdparty-dir }}/vcpkg/installed/x64-windows/tools/lua"
+        echo $lua_path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install ktm
       working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
@@ -97,17 +98,28 @@ jobs:
       run: |
         git clone https://github.com/YGXXD/ntr.git
         cd ntr
-        git checkout con
         cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -S . -G ${{ matrix.cmake_project }}
         cmake --build build --config Release
         ${{ matrix.root }} cmake --install build --config Release
 
-    - name: Configure CMake
+    - name: Configure CMake (Linux, macOS)
+      if: runner.os != 'Windows'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DLUA_TEST_ENABLE=ON
+        -S ${{ github.workspace }}
+        -G ${{ matrix.cmake_project }}
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DLUA_TEST_ENABLE=ON
+        -DCMAKE_TOOLCHAIN_FILE=${{ steps.strings.outputs.build-3rdparty-dir }}/vcpkg/scripts/buildsystems/vcpkg.cmake
         -S ${{ github.workspace }}
         -G ${{ matrix.cmake_project }}
 
