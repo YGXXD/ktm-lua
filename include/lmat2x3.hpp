@@ -13,7 +13,7 @@ struct lmat3x3;
 template <typename T>
 struct lmat3x2;
 
-#include "ktm/ktm/ktm.h"
+#include <ktm/ktm.h>
 #include "lvec3.hpp"
 
 template <typename T>

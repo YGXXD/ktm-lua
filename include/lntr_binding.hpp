@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string_view>
-#include "ntr/inc/nephren.hpp"
+#include <ntr/nephren.hpp>
 
 struct lua_State;
 

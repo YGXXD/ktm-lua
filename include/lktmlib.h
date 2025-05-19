@@ -7,9 +7,6 @@
 
 #pragma once
 
-extern "C"
-{
-#include "lua/lua.h"
+#include <lua.h>
 
-    LUAMOD_API int luaopen_ktm(lua_State* L);
-}
+LUAMOD_API int luaopen_ktm(lua_State* L);

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "ktm/ktm/ktm.h"
+#include <ktm/ktm.h>
 #include "lvec2.hpp"
 
 template <typename T>

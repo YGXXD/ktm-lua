@@ -20,7 +20,6 @@
 #include "lmat4x2.hpp"
 #include "lmat4x3.hpp"
 #include "lmat4x4.hpp"
-#include "lktmlib.hpp"
 
 std::vector<std::string_view> registed_ntr_type_names()
 {
@@ -124,8 +123,11 @@ std::vector<std::string_view> registed_ntr_type_names()
 
 extern "C"
 {
-#include "lua/lua.h"
-#include "lua/lauxlib.h"
+#define LUA_LIB
+
+#include <lua.h>
+#include <lauxlib.h>
+#include "lktmlib.h"
 
     LUAMOD_API int luaopen_ktm(lua_State* L)
     {

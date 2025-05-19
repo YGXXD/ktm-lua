@@ -1,5 +1,5 @@
 #include "lmat2x2.hpp"
-#include "ntr/inc/nephren.hpp"
+#include <ntr/nephren.hpp>
 
 template <typename T>
 lmat2x2<T> lmat2x2<T>::__add(const lmat2x2<T>& other)

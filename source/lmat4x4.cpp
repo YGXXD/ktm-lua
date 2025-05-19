@@ -1,5 +1,5 @@
 #include "lmat4x4.hpp"
-#include "ntr/inc/nephren.hpp"
+#include <ntr/nephren.hpp>
 
 template <typename T>
 lmat4x4<T> lmat4x4<T>::__add(const lmat4x4<T>& other)

@@ -17,24 +17,33 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
 	add_compile_options(-march=native)
 endif()
 
-set(LUA_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/lua)
-file(GLOB LUALIB_SOURCES ${LUA_SOURCE_DIR}/*.c)
-list(REMOVE_ITEM LUALIB_SOURCES ${LUA_SOURCE_DIR}/lua.c)
-list(REMOVE_ITEM LUALIB_SOURCES ${LUA_SOURCE_DIR}/onelua.c)
-add_library(lualib STATIC ${LUALIB_SOURCES})
+find_package(Lua REQUIRED)
+find_package(ktm REQUIRED)
+find_package(ntr REQUIRED)
 
-set(NTR_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ntr)
-file(GLOB_RECURSE NTRLIB_SOURCES ${NTR_SOURCE_DIR}/src/*.cpp)
-add_library(ntrlib STATIC ${NTRLIB_SOURCES})
-target_include_directories(ntrlib PUBLIC ${NTR_SOURCE_DIR}/inc)
+file(GLOB LUAKTM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+add_library(${PROJECT_NAME} SHARED ${LUAKTM_SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+	OUTPUT_NAME "ktm"
+	PREFIX ""
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ntr::ntr)
+target_link_libraries(${PROJECT_NAME} PRIVATE ktm::ktm)
+target_include_directories(${PROJECT_NAME} PUBLIC ${LUA_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-file(GLOB LUAKTM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/ktm-lua.cpp)
-add_executable(${PROJECT_NAME} ${LUAKTM_SOURCES})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE lualib)
-target_link_libraries(${PROJECT_NAME} PRIVATE ntrlib)
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+if (LUA_TEST_ENABLE)
+	enable_testing()
+	find_program(LUA lua)
+	file(GLOB TEST_LUA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.lua)
+	foreach(TEST_LUA_FILE ${TEST_LUA_FILES})
+        get_filename_component(TEST_NAME ${TEST_LUA_FILE} NAME_WE)
+        add_test(NAME ${TEST_NAME} 
+			COMMAND 
+			${LUA} 
+			-e "package.cpath='${CMAKE_BINARY_DIR}/?.dylib;${CMAKE_BINARY_DIR}/?.so;${CMAKE_BINARY_DIR}/?.dll;'..package.cpath" 
+			${TEST_LUA_FILE}
+		)
+	endforeach()
+endif()
