@@ -62,35 +62,44 @@ jobs:
       id: strings
       shell: bash
       run: |
-        mkdir ${{ github.workspace }}/3rdparty
+        mkdir "${{ github.workspace }}/3rdparty"
         echo "build-3rdparty-dir=${{ github.workspace }}/3rdparty" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: install lua
-      uses: xpol/setup-lua@v0.3
-      with:
-        lua-version: 5.4
+    - name: Install Lua (Linux)
+      if: runner.os == 'Linux'
+      run: sudo apt-get install lua5.4 liblua5.4-dev
 
-    - name: install ktm
+    - name: Install Lua (macOS)
+      if: runner.os == 'macOS'
+      run: brew install lua
+
+    - name: Install Lua (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+        }
+        scoop bucket add extras
+        scoop install luarocks
+        luarocks install lua-dev
+
+    - name: Install ktm
       working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
       run: |
         git clone https://github.com/YGXXD/ktm.git
         cd ktm
-        cmake -B build \
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
-        -S . -G ${{ matrix.cmake_project }}
+        cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -S . -G ${{ matrix.cmake_project }}
         ${{ matrix.root }} cmake --install build --config Release
 
-    - name: install ntr
+    - name: Install ntr
       working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
       run: |
         git clone https://github.com/YGXXD/ntr.git
         cd ntr
-        cmake -B build \
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
-        -S . -G ${{ matrix.cmake_project }}
+        git checkout con
+        cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -S . -G ${{ matrix.cmake_project }}
+        cmake --build build --config Release
         ${{ matrix.root }} cmake --install build --config Release
 
     - name: Configure CMake
@@ -108,4 +117,4 @@ jobs:
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest -V --build-config ${{ matrix.build_type }}
+      run: ctest -V --output-on-failure --build-config ${{ matrix.build_type }}

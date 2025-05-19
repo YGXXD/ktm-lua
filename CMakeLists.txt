@@ -37,12 +37,22 @@ if (LUA_TEST_ENABLE)
 	enable_testing()
 	find_program(LUA lua)
 	file(GLOB TEST_LUA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.lua)
+	set(SEARCH_LIB_PATHS "")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/?.dylib;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/Debug/?.dylib;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/Release/?.dylib;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/?.so;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/Debug/?.so;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/Release/?.so;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/?.dll;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/Debug/?.dll;")
+	string(APPEND SEARCH_LIB_PATHS "${CMAKE_BINARY_DIR}/Release/?.dll;")
 	foreach(TEST_LUA_FILE ${TEST_LUA_FILES})
         get_filename_component(TEST_NAME ${TEST_LUA_FILE} NAME_WE)
         add_test(NAME ${TEST_NAME} 
 			COMMAND 
 			${LUA} 
-			-e "package.cpath='${CMAKE_BINARY_DIR}/?.dylib;${CMAKE_BINARY_DIR}/?.so;${CMAKE_BINARY_DIR}/?.dll;'..package.cpath" 
+			-e "package.cpath='${SEARCH_LIB_PATHS}..package.cpath'" 
 			${TEST_LUA_FILE}
 		)
 	endforeach()
