@@ -57,28 +57,55 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-
+    
     - name: Set reusable strings
       id: strings
       shell: bash
       run: |
+        mkdir ${{ github.workspace }}/3rdparty
+        echo "build-3rdparty-dir=${{ github.workspace }}/3rdparty" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: install lua
+      uses: xpol/setup-lua@v0.3
+      with:
+        lua-version: 5.4
+
+    - name: install ktm
+      working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
+      run: |
+        git clone https://github.com/YGXXD/ktm.git
+        cd ktm
+        cmake -B build \
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+        -S . -G ${{ matrix.cmake_project }}
+        ${{ matrix.root }} cmake --install build --config Release
+
+    - name: install ntr
+      working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
+      run: |
+        git clone https://github.com/YGXXD/ntr.git
+        cd ntr
+        cmake -B build \
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+        -S . -G ${{ matrix.cmake_project }}
+        ${{ matrix.root }} cmake --install build --config Release
 
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DLUA_TEST_ENABLE=ON
         -S ${{ github.workspace }}
         -G ${{ matrix.cmake_project }}
 
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: cmake --build . --config ${{ matrix.build_type }}
 
-    - name: Install
-      run: ${{ matrix.root }} cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
-    
-    - name: Run
-      run: bin/ktm-lua scripts/ktm.lua
+    - name: Test
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest -V --build-config ${{ matrix.build_type }}
