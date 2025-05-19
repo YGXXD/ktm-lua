@@ -28,7 +28,7 @@ file(GLOB_RECURSE NTRLIB_SOURCES ${NTR_SOURCE_DIR}/src/*.cpp)
 add_library(ntrlib STATIC ${NTRLIB_SOURCES})
 target_include_directories(ntrlib PUBLIC ${NTR_SOURCE_DIR}/inc)
 
-file(GLOB LUAKTM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+file(GLOB LUAKTM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/ktm-lua.cpp)
 add_executable(${PROJECT_NAME} ${LUAKTM_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE lualib)
