@@ -14,7 +14,6 @@ cmake --install build --config Release
 #### ntr库
 
 ```shell
-# unix
 git clone https://github.com/YGXXD/ntr.git
 cd ktm
 cmake -S . -B ./build
@@ -45,6 +44,7 @@ cmake --build build --config Release
 #### 测试ktm-lua库
 ```lua
 -- test.lua
+package.cpath = './build/?.so;./build/?.dylib;./build/?.dll;'..package.cpath
 local ktm = require("ktm")
 local vec0 = ktm.fvec3.create(1, 2, 3)
 local vec1 = ktm.fvec3.create(4, 5, 6)
