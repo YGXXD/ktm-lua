@@ -3,8 +3,8 @@
 
 extern "C"
 {
-#include "lua/lua.h"
-#include "lua/lauxlib.h"
+#include <lua.h>
+#include <lauxlib.h>
 }
 
 void* lua_ntr_new_data(lua_State* L, const ntr::nclass* type)

@@ -1,15 +1,55 @@
 # ktm-lua
 
-### 项目依赖
+### 安装依赖
 
-#### ktm图形数学库
-> https://github.com/YGXXD/ktm
+#### ktm库
 
-#### ntr类型反射库
-> https://github.com/YGXXD/ntr
+```shell
+git clone https://github.com/YGXXD/ktm.git
+cd ktm
+cmake -S . -B ./build
+cmake --install build --config Release
+```
 
-#### lua语言源代码
-> https://github.com/lua/lua
+#### ntr库
+
+```shell
+git clone https://github.com/YGXXD/ntr.git
+cd ktm
+cmake -S . -B ./build
+cmake --build build --config Release
+cmake --install build --config Release
+```
+
+#### lua解释器
+```shell
+# macos
+brew install lua
+
+# linux
+apt-get install lua5.4 liblua5.4-dev
+
+# windows
+scoop install lua
+```
+
+### 编译运行
+
+#### 构建ktm-lua库
+```shell
+cmake -S . -B ./build
+cmake --build build --config Release
+```
+
+#### 测试ktm-lua库
+```lua
+-- test.lua
+package.cpath = './build/?.so;./build/?.dylib;./build/?.dll;'..package.cpath
+local ktm = require("ktm")
+local vec0 = ktm.fvec3.create(1, 2, 3)
+local vec1 = ktm.fvec3.create(4, 5, 6)
+print(vec0 + vec1)
+```
 
 ### 许可证
 

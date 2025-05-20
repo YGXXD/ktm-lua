@@ -5,7 +5,6 @@
 //  Created by 有个小小杜
 //
 
-#include <iostream>
 #include "lntr_binding.hpp"
 #include "lvec2.hpp"
 #include "lvec3.hpp"
@@ -124,11 +123,13 @@ std::vector<std::string_view> registed_ntr_type_names()
 
 extern "C"
 {
-#include "lua/lua.h"
-#include "lua/lualib.h"
-#include "lua/lauxlib.h"
+#define LUA_LIB
 
-    extern int luaopen_ktm(lua_State* L)
+#include <lua.h>
+#include <lauxlib.h>
+#include "lktmlib.h"
+
+    LUAMOD_API int luaopen_ktm(lua_State* L)
     {
         luaL_checkversion(L);
         lua_newtable(L);
@@ -140,26 +141,4 @@ extern "C"
         }
         return 1;
     }
-}
-
-int main(int argc, char* argv[])
-{
-    lua_State* L = luaL_newstate();
-    luaL_openlibs(L);
-
-    lua_pushcfunction(L, luaopen_ktm);
-    lua_call(L, 0, 1);
-    lua_setglobal(L, "ktm");
-
-    if (argc > 1)
-    {
-        if (luaL_dofile(L, argv[1]) != LUA_OK)
-        {
-            std::cerr << "Lua Runtime Error: " << lua_tostring(L, -1) << std::endl;
-        }
-    }
-
-    lua_close(L);
-
-    return 0;
 }

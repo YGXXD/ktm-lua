@@ -5,6 +5,8 @@
 --  Created by 有个小小杜
 --
 
+local ktm = require("ktm")
+
 print("test ktm-lua script")
 
 local function main()

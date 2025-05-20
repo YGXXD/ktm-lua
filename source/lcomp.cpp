@@ -1,5 +1,5 @@
 #include "lcomp.hpp"
-#include "ntr/inc/nephren.hpp"
+#include <ntr/nephren.hpp>
 
 template <typename T>
 lcomp<T> lcomp<T>::__add(const lcomp<T>& other)
