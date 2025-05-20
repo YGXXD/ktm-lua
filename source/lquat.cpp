@@ -1,5 +1,5 @@
 #include "lquat.hpp"
-#include "ntr/inc/nephren.hpp"
+#include <ntr/nephren.hpp>
 
 template <typename T>
 lquat<T> lquat<T>::__add(const lquat<T>& other)

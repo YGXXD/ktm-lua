@@ -13,7 +13,7 @@ struct lmat2x2;
 template <typename T>
 struct lmat2x4;
 
-#include "ktm/ktm/ktm.h"
+#include <ktm/ktm.h>
 #include "lvec2.hpp"
 
 template <typename T>

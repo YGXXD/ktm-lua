@@ -57,28 +57,76 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-
+    
     - name: Set reusable strings
       id: strings
       shell: bash
       run: |
+        mkdir "${{ github.workspace }}/3rdparty"
+        echo "build-3rdparty-dir=${{ github.workspace }}/3rdparty" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake
+    - name: Install Lua (Linux)
+      if: runner.os == 'Linux'
+      run: sudo apt-get install lua5.4 liblua5.4-dev
+
+    - name: Install Lua (macOS)
+      if: runner.os == 'macOS'
+      run: brew install lua
+
+    - name: Install Lua (Windows)
+      if: runner.os == 'Windows'
+      working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat
+        ./vcpkg install lua[tools]
+        $lua_path = "${{ steps.strings.outputs.build-3rdparty-dir }}/vcpkg/installed/x64-windows/tools/lua"
+        echo $lua_path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Install ktm
+      working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
+      run: |
+        git clone https://github.com/YGXXD/ktm.git
+        cd ktm
+        cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -S . -G ${{ matrix.cmake_project }}
+        ${{ matrix.root }} cmake --install build --config Release
+
+    - name: Install ntr
+      working-directory: ${{ steps.strings.outputs.build-3rdparty-dir }}
+      run: |
+        git clone https://github.com/YGXXD/ntr.git
+        cd ntr
+        cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -S . -G ${{ matrix.cmake_project }}
+        cmake --build build --config Release
+        ${{ matrix.root }} cmake --install build --config Release
+
+    - name: Configure CMake (Linux, macOS)
+      if: runner.os != 'Windows'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DLUA_TEST_ENABLE=ON
+        -S ${{ github.workspace }}
+        -G ${{ matrix.cmake_project }}
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DLUA_TEST_ENABLE=ON
+        -DCMAKE_TOOLCHAIN_FILE=${{ steps.strings.outputs.build-3rdparty-dir }}/vcpkg/scripts/buildsystems/vcpkg.cmake
         -S ${{ github.workspace }}
         -G ${{ matrix.cmake_project }}
 
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: cmake --build . --config ${{ matrix.build_type }}
 
-    - name: Install
-      run: ${{ matrix.root }} cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
-    
-    - name: Run
-      run: bin/ktm-lua scripts/ktm.lua
+    - name: Test
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest -V --output-on-failure --build-config ${{ matrix.build_type }}

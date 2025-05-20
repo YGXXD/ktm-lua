@@ -1,5 +1,5 @@
 #include "lvec3.hpp"
-#include "ntr/inc/nephren.hpp"
+#include <ntr/nephren.hpp>
 
 template <typename T>
 lvec3<T> lvec3<T>::__add(const lvec3<T>& other)

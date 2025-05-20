@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "ktm/ktm/ktm.h"
+#include <ktm/ktm.h>
 
 template <typename T>
 struct lcomp
