@@ -15,7 +15,7 @@ cmake --install build --config Release
 
 ```shell
 git clone https://github.com/YGXXD/ntr.git
-cd ktm
+cd ntr
 cmake -S . -B ./build
 cmake --build build --config Release
 cmake --install build --config Release
