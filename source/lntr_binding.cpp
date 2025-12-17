@@ -53,7 +53,7 @@ void lua_ntr_pushnobject(lua_State* L, ntr::nobject& object)
     }
     else if (object.type()->is_registered() && object.type()->is_class())
     {
-        if (object.kind() == ntr::nobject::eobject::eref)
+        if (object.is_ref())
         {
             lua_pushlightuserdata(L, object.data());
         }
@@ -89,12 +89,12 @@ ntr::nobject lua_ntr_checknobject(lua_State* L, int index, const ntr::ntype* typ
     {
         size_t len;
         const char* str = luaL_checklstring(L, index, &len);
-        return type->new_instance_rv(ntr::nwrapper(std::string(str, len)));
+        return type->move_instance(ntr::nwrapper(std::string(str, len)));
     }
     else if (type->is_registered() && type->is_class())
     {
         void* userdata = lua_ntr_check_data(L, index, type->as_class());
-        return type->new_reference(ntr::nwrapper(type, userdata));
+        return type->ref_instance(ntr::nwrapper(type, userdata));
     }
     else
     {
@@ -169,7 +169,7 @@ int lua_ntr_call(lua_State* L, const ntr::nclass* type, const std::string_view& 
     std::string_view type_name = type->name();
 
     const ntr::nfunction* function = type->get_function(function_name);
-    std::vector<ntr::nobject> object_temps;
+    ntr::nvector<ntr::nobject> object_temps;
     object_temps.reserve(8);
     for (int i = 0; i < function->argument_types().size(); ++i)
     {
@@ -177,7 +177,7 @@ int lua_ntr_call(lua_State* L, const ntr::nclass* type, const std::string_view& 
         object_temps.push_back(lua_ntr_checknobject(L, i + 1, arg_type));
     }
 
-    std::vector<ntr::nwrapper> args;
+    ntr::nvector<ntr::nwrapper> args;
     args.reserve(object_temps.size());
     for (const auto& object : object_temps)
     {
@@ -202,7 +202,7 @@ void lua_ntr_set_function(lua_State* L, const ntr::nclass* type)
 
     /* | table | | metatable | */
     lua_pushlightuserdata(L, const_cast<ntr::nclass*>(type));
-    for (auto it = type->function_begin(); it != type->function_end(); ++it)
+    for (auto it = type->functions().begin(); it != type->functions().end(); ++it)
     {
         std::string_view func_name = (*it).get()->name();
         lua_pushvalue(L, -1);

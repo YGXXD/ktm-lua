@@ -5,6 +5,8 @@
 --  Created by 有个小小杜
 --
 
+package.cpath="/Users/chenqiudu/Project/ktm-lua/build/?.dylib;"..package.cpath
+
 local ktm = require("ktm")
 
 print("test ktm-lua script")
