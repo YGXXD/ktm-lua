@@ -27,6 +27,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	OUTPUT_NAME "ktm"
 	PREFIX ""
 )
+if(WIN32)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC LUA_BUILD_AS_DLL)
+endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ntr::ntr)
 target_link_libraries(${PROJECT_NAME} PRIVATE ktm::ktm)
