@@ -127,9 +127,8 @@ extern "C"
 
 #include <lua.h>
 #include <lauxlib.h>
-#include "lktmlib.h"
 
-    LUAMOD_API int luaopen_ktm(lua_State* L)
+    LUALIB_API int luaopen_ktm(lua_State* L)
     {
         luaL_checkversion(L);
         lua_newtable(L);
