@@ -30,7 +30,7 @@ brew install lua
 apt-get install lua5.4 liblua5.4-dev
 
 # windows
-scoop install lua
+vcpkg install lua
 ```
 
 ### 编译运行
