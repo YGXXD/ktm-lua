@@ -1,4 +1,5 @@
 #include "lntr_binding.hpp"
+#include <string>
 #include <cstring>
 
 extern "C"
